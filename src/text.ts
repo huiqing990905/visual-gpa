@@ -2,6 +2,7 @@ export const TEXT = {
     BRAND: {
         NAME: "VisualGPA",
         TAGLINE: "ACADEMIC INTELLIGENCE",
+        BASE_URL: import.meta.env.VITE_BASE_URL || "https://visualgpa.hqinglab.tech",
         SELECT_ARCH: "Select Architecture"
     },
     HEADER: {

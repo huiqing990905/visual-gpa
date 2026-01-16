@@ -248,11 +248,11 @@ export const Workspace = () => {
                 <meta name="description" content={`Calculate your projected CGPA for ${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} with VisualGPA. The most accurate and visual grading planner.`} />
                 <meta name="keywords" content={getSeoKeywords()} />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content={`https://visualgpa.app/${currentUni?.id}`} />
+                <meta property="og:url" content={`${TEXT.BRAND.BASE_URL}/${currentUni?.id}`} />
                 <meta property="og:title" content={`${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} CGPA Calculator`} />
                 <meta property="og:description" content={`The official visual GPA planner for ${currentUni?.shortName || currentUni?.name}. Plan scenarios and track performance.`} />
-                <meta property="og:image" content={`https://visualgpa.app${currentUni?.imageUrl}`} />
-                <link rel="canonical" href={`https://visualgpa.app/${currentUni.id}`} />
+                <meta property="og:image" content={`${TEXT.BRAND.BASE_URL}${currentUni?.imageUrl}`} />
+                <link rel="canonical" href={`${TEXT.BRAND.BASE_URL}/${currentUni.id}`} />
             </Helmet>
 
             {/* CUSTOM CONFIRM MODAL */}
