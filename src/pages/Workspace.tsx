@@ -247,8 +247,11 @@ export const Workspace = () => {
                 <title>{currentUni ? `${currentUni.name} ${currentUni.shortName ? `(${currentUni.shortName})` : ''} CGPA Calculator` : 'VisualGPA - Academic Intelligence'}</title>
                 <meta name="description" content={`Calculate your projected CGPA for ${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} with VisualGPA. The most accurate and visual grading planner.`} />
                 <meta name="keywords" content={getSeoKeywords()} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`https://visualgpa.app/${currentUni?.id}`} />
                 <meta property="og:title" content={`${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} CGPA Calculator`} />
-                <meta property="og:description" content={`Plan course scenarios for${currentUni?.shortName ? ` ${currentUni?.shortName}` : ''} and visualize grading outcomes.`} />
+                <meta property="og:description" content={`The official visual GPA planner for ${currentUni?.shortName || currentUni?.name}. Plan scenarios and track performance.`} />
+                <meta property="og:image" content={`https://visualgpa.app${currentUni?.imageUrl}`} />
                 <link rel="canonical" href={`https://visualgpa.app/${currentUni.id}`} />
             </Helmet>
 
