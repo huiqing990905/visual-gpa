@@ -15,13 +15,23 @@ export async function generateMetadata({ params }: { params: Promise<{ uni: stri
         };
     }
 
-    const title = `${uni.name} ${uni.shortName ? `(${uni.shortName})` : ''} CGPA Calculator`;
-    const description = `The official visual GPA planner for ${uni.shortName || uni.name}. Plan scenarios and track performance with precision.`;
+    const title = `${uni.name} ${uni.shortName && uni.shortName !== uni.name ? `(${uni.shortName})` : ''} CGPA Calculator`;
+    const description = `Calculate your ${uni.shortName || uni.name} CGPA instantly with VisualGPA. The most accurate, visual GPA planner for ${uni.shortName || uni.name} students in Malaysia. Track performance, plan target GPAs, and simulate scenarios.`;
     const imageUrl = `${baseUrl}${uni.imageUrl}`;
 
     return {
         title: title,
         description: description,
+        keywords: [
+            `${uni.shortName || uni.name} cgpa calculator`,
+            `${uni.name} cgpa calculator`,
+            `${uni.shortName || uni.name} gpa calculator`,
+            `calculate cgpa ${uni.shortName || uni.name}`,
+            `${uni.shortName || uni.name} grading system`,
+            `${uni.shortName || uni.name} grading scale`,
+            'malaysia university cgpa calculator',
+            'visual gpa planner'
+        ],
         openGraph: {
             title: title,
             description: description,
