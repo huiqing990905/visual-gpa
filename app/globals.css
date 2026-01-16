@@ -1229,3 +1229,114 @@ body {
     display: block !important;
   }
 }
+
+/* --- VERTICAL RESPONSIVENESS --- */
+@media (max-height: 850px) {
+
+  /* Compact Sidebar */
+  .sidebar {
+    padding: 1.5rem 1rem;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .step-label {
+    margin-bottom: 0.75rem;
+  }
+
+  .config-box {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .input-super {
+    font-size: 1.2rem;
+    padding: 0.1rem 0;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Compact Main Content */
+  .toolbar {
+    height: 60px;
+    padding: 0 1.5rem;
+  }
+
+  .course-list {
+    padding: 1rem 1.5rem;
+  }
+
+  .holo-row {
+    padding: 0.75rem;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Compact Rail (HUD) */
+  .rail {
+    padding: 2rem 1rem;
+  }
+
+  .hud-ring {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 1.5rem;
+  }
+
+  .gpa-hero {
+    font-size: 2.5rem;
+  }
+
+  .impact-meter {
+    margin-bottom: 1.5rem;
+  }
+
+  .impact-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+
+  .impact-delta {
+    font-size: 1.2rem;
+  }
+
+  .hud-stat {
+    padding: 0.75rem 0;
+  }
+}
+
+@media (max-height: 650px) {
+
+  /* Ultra Compact */
+  .sidebar,
+  .rail {
+    padding: 1rem;
+    /* width: 280px;  Avoid changing width as it breaks grid unless handled */
+  }
+
+  .brand-title {
+    margin-bottom: 1rem;
+  }
+
+  .hud-ring {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1rem;
+  }
+
+  .gpa-hero {
+    font-size: 2rem;
+  }
+
+  .holo-row {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-super {
+    font-size: 1.1rem;
+  }
+}
