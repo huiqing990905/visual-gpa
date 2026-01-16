@@ -244,11 +244,11 @@ export const Workspace = () => {
     return (
         <div className="app-shell" style={{ height: '100vh', display: 'flex' }}>
             <Helmet>
-                <title>{currentUni ? `${currentUni.name} CGPA Calculator - VisualGPA` : 'VisualGPA - Academic Intelligence'}</title>
-                <meta name="description" content={`Calculate your projected CGPA for ${currentUni?.name || 'your university'} with VisualGPA. Plan course scenarios, track academic performance, and visualize grading outcomes.`} />
+                <title>{currentUni ? `${currentUni.name} ${currentUni.shortName ? `(${currentUni.shortName})` : ''} CGPA Calculator` : 'VisualGPA - Academic Intelligence'}</title>
+                <meta name="description" content={`Calculate your projected CGPA for ${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} with VisualGPA. The most accurate and visual grading planner.`} />
                 <meta name="keywords" content={getSeoKeywords()} />
-                <meta property="og:title" content={`${currentUni?.name} CGPA Calculator`} />
-                <meta property="og:description" content="Plan course scenarios and visualize grading outcomes." />
+                <meta property="og:title" content={`${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} CGPA Calculator`} />
+                <meta property="og:description" content={`Plan course scenarios for${currentUni?.shortName ? ` ${currentUni?.shortName}` : ''} and visualize grading outcomes.`} />
             </Helmet>
 
             {/* CUSTOM CONFIRM MODAL */}
@@ -360,10 +360,10 @@ export const Workspace = () => {
                     <div className="sidebar-card-img" style={{ backgroundImage: `url(${currentUni.imageUrl})` }}></div>
                     <div className="sidebar-card-content">
                         <div style={{ fontSize: '0.65rem', color: 'var(--accent-cyan)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Active Architecture</div>
-                        <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', lineHeight: '1.1', fontWeight: 700, color: 'white', marginBottom: '0.5rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', lineHeight: '1.1', fontWeight: 700, color: 'white', marginBottom: '0.5rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)', margin: '0 0 0.5rem 0' }}>
                             {currentUni.name}
                             {currentUni.shortName && <span style={{ opacity: 0.7, marginLeft: '0.4rem', fontWeight: 400, fontSize: '0.9em' }}>({currentUni.shortName})</span>}
-                        </div>
+                        </h1>
                         <div style={{ fontSize: '0.7rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.8 }}>
                             <span style={{ fontSize: '0.8rem' }}>↺</span> Change Architecture
                         </div>
