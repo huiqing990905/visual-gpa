@@ -102,10 +102,26 @@ export const TEXT = {
     },
     FOOTER: {
         DISCLAIMER: "This tool is for planning purposes only and is not an official academic record.",
-        TERMS: "Terms",
-        PRIVACY: "Privacy",
+        LEGAL: "Legal & Privacy",
         CONTACT: "Contact"
     },
+    LANDING_FEATURES: [
+        {
+            TITLE: "Privacy First",
+            DESC: "100% Client-side. Your academic data never leaves your device. No login required.",
+            ICON: "/feature_privacy.png"
+        },
+        {
+            TITLE: "Visual Analytics",
+            DESC: "Don't just calculate numbers. See your GPA trends and understand the impact of every grade.",
+            ICON: "/feature_analytics.png"
+        },
+        {
+            TITLE: "Scenario Planning",
+            DESC: "Simulate future semesters. What happens if you score all A's? Find out instantly.",
+            ICON: "/feature_scenario.png"
+        }
+    ],
     ABOUT_MODAL: {
         TITLE: "About VisualGPA",
         DISCLAIMER: "This project is independently maintained. It serves as a planning tool only and does not provide official academic advice or verification of university records.",

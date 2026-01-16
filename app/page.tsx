@@ -7,10 +7,84 @@ import { TEXT } from '../src/text';
 
 export default function LandingPage() {
     const router = useRouter();
+    const [showLegal, setShowLegal] = (typeof window !== 'undefined') ? require('react').useState(false) : [false, () => { }];
+    const [showContact, setShowContact] = (typeof window !== 'undefined') ? require('react').useState(false) : [false, () => { }];
 
     const handleUniversitySelect = (id: string) => {
         router.push(`/${id}`);
     };
+
+    // Simple Legal Modal Component
+    const LegalModal = () => {
+        if (!showLegal) return null;
+        return (
+            <div className="gl-modal-overlay" onClick={() => setShowLegal(false)}>
+                <div className="gl-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px', textAlign: 'left', maxHeight: '80vh', overflowY: 'auto' }}>
+                    <h2 style={{ fontFamily: 'var(--font-display)', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem' }}>
+                        {TEXT.LEGAL.TITLE}
+                    </h2>
+                    {TEXT.LEGAL.SECTIONS.map((sec, i) => (
+                        <div key={i} style={{ marginBottom: '2rem' }}>
+                            <h3 style={{ fontSize: '1rem', color: 'var(--accent-cyan)', marginBottom: '0.5rem' }}>{sec.HEADING}</h3>
+                            {sec.CONTENT.map((line, j) => (
+                                <p key={j} style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.6', marginBottom: '0.5rem' }}>{line}</p>
+                            ))}
+                        </div>
+                    ))}
+                    <button className="btn-ghost" onClick={() => setShowLegal(false)} style={{ width: '100%', marginTop: '1rem' }}>
+                        {TEXT.LEGAL.CLOSE}
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    // Contact Modal Component
+    const ContactModal = () => {
+        if (!showContact) return null;
+        return (
+            <div className="gl-modal-overlay" onClick={() => setShowContact(false)}>
+                <div className="gl-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'left' }}>
+                    <h2 style={{ fontFamily: 'var(--font-display)', marginBottom: '0.5rem', borderBottom: '1px solid var(--border-glass)', paddingBottom: '1rem' }}>
+                        {TEXT.FOOTER.CONTACT}
+                    </h2>
+                    <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+                        {TEXT.ABOUT_MODAL.CONTACT_MSG}
+                    </p>
+
+                    <div className="contact-grid">
+                        <a href={`mailto:${TEXT.ABOUT_MODAL.EMAIL}`} className="contact-link-card">
+                            <div className="contact-icon">✉️</div>
+                            <div className="contact-info">
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase' }}>Email</div>
+                                <div style={{ fontSize: '0.9rem', color: 'white' }}>{TEXT.ABOUT_MODAL.EMAIL}</div>
+                            </div>
+                        </a>
+                        <a href={TEXT.ABOUT_MODAL.LINKEDIN} target="_blank" rel="noopener noreferrer" className="contact-link-card">
+                            <div className="contact-icon">💼</div>
+                            <div className="contact-info">
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase' }}>LinkedIn</div>
+                                <div style={{ fontSize: '0.9rem', color: 'white' }}>Connect Profile</div>
+                            </div>
+                        </a>
+                        <a href={TEXT.ABOUT_MODAL.INSTAGRAM} target="_blank" rel="noopener noreferrer" className="contact-link-card">
+                            <div className="contact-icon">📸</div>
+                            <div className="contact-info">
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase' }}>Instagram</div>
+                                <div style={{ fontSize: '0.9rem', color: 'white' }}>@{TEXT.ABOUT_MODAL.INSTAGRAM.split('/').filter(Boolean).pop()}</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <button className="btn-ghost" onClick={() => setShowContact(false)} style={{ width: '100%' }}>
+                        {TEXT.LEGAL.CLOSE}
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+
 
     return (
         <div className="landing-hero">
@@ -72,9 +146,35 @@ export default function LandingPage() {
                 </div>
             </div>
 
-            <div style={{ marginTop: '5rem', paddingBottom: '2rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)', textAlign: 'center', width: '100%', pointerEvents: 'none' }}>
-                This is a planning and reference tool. Not an official academic system.
+            {/* FEATURES GRID */}
+            <div className="feature-grid">
+                {TEXT.LANDING_FEATURES.map((feat, idx) => (
+                    <div key={idx} className="feature-card">
+                        <div className="feature-icon" style={{ background: 'transparent', padding: 0 }}>
+                            <img src={feat.ICON} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(34,211,238,0.3))' }} />
+                        </div>
+                        <div className="feature-title">{feat.TITLE}</div>
+                        <div className="feature-desc">{feat.DESC}</div>
+                    </div>
+                ))}
             </div>
+
+            {/* FOOTER */}
+            <footer className="landing-footer">
+                <div className="footer-nav">
+                    <span className="footer-link" onClick={() => setShowLegal(true)}>{TEXT.FOOTER.LEGAL}</span>
+                    <span className="footer-link" onClick={() => setShowContact(true)}>{TEXT.FOOTER.CONTACT}</span>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)' }}>
+                    {TEXT.FOOTER.DISCLAIMER}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', opacity: 0.5 }}>
+                    © {new Date().getFullYear()} {TEXT.BRAND.NAME}. All rights reserved.
+                </div>
+            </footer>
+
+            <LegalModal />
+            <ContactModal />
         </div>
     );
 }

@@ -60,7 +60,10 @@ export default function Workspace() {
     const [showAboutModal, setShowAboutModal] = useState(false);
     const [showTransparency, setShowTransparency] = useState(false);
     const [showLegalModal, setShowLegalModal] = useState(false);
+
+
     const [showConfigModal, setShowConfigModal] = useState(false); // New Config Modal
+    const [showGradingModal, setShowGradingModal] = useState(false); // Grading Scheme Modal
 
     // Custom Grading Scale State
     const [customGradingScale, setCustomGradingScale] = useState<{ grade: string, point: number }[]>(() => {
@@ -96,11 +99,27 @@ export default function Workspace() {
     const isCustomMode = currentUni?.id === 'custom';
 
     const currentPolicy = isCustomMode
-        ? { ...currentUni?.policies[0], gradingScale: customGradingScale }
+        ? {
+            ...currentUni?.policies[0],
+            gradingScale: customGradingScale,
+            maxCGPA: Math.max(...customGradingScale.map(g => g.point), 0) || 4.0
+        }
         : (currentUni?.policies.find(p => p.id === activePolicyId) || currentUni?.policies[0]);
 
     const gradeOptions = currentPolicy?.gradingScale.map(g => g.grade) || [];
     const maxCGPA = currentPolicy?.maxCGPA || 4.00;
+
+    // Auto-fix: Clamp CGPA/Target if they exceed new max (e.g. switching 5.0 -> 4.0 scale)
+    useEffect(() => {
+        const val = parseFloat(currentCGPA);
+        if (!isNaN(val) && val > maxCGPA) {
+            setCurrentCGPA(maxCGPA.toFixed(2));
+        }
+        const tVal = parseFloat(targetCGPA);
+        if (!isNaN(tVal) && tVal > maxCGPA) {
+            setTargetCGPA(maxCGPA.toFixed(2));
+        }
+    }, [maxCGPA, currentCGPA, targetCGPA]);
 
     // Handler for custom scale
     const updateCustomGrade = (idx: number, field: 'grade' | 'point', value: any) => {
@@ -112,7 +131,86 @@ export default function Workspace() {
     const addCustomGrade = () => setCustomGradingScale([...customGradingScale, { grade: '?', point: 0 }]);
     const removeCustomGrade = (idx: number) => setCustomGradingScale(customGradingScale.filter((_, i) => i !== idx));
 
-    /* Input Handling */
+    // Preset Handlers
+    const handlePreset = (type: '4.0' | '5.0') => {
+        if (type === '4.0') {
+            setCustomGradingScale([
+                { grade: 'A', point: 4.0 }, { grade: 'B', point: 3.0 }, { grade: 'C', point: 2.0 }, { grade: 'F', point: 0.0 }
+            ]);
+        } else {
+            setCustomGradingScale([
+                { grade: 'A', point: 5.0 }, { grade: 'B', point: 4.0 }, { grade: 'C', point: 3.0 }, { grade: 'D', point: 2.0 }, { grade: 'E', point: 1.0 }, { grade: 'F', point: 0.0 }
+            ]);
+        }
+    };
+
+    /* --- COMPONENTS --- */
+
+    const GradingModal = () => {
+        if (!showGradingModal) return null;
+        return (
+            <div className="modal-overlay fade-in" onClick={() => setShowGradingModal(false)} style={{
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+            }}>
+                <div className="modal-content scale-up" onClick={e => e.stopPropagation()} style={{
+                    background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)',
+                    padding: '2rem', borderRadius: '16px', width: '90%', maxWidth: '500px',
+                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', position: 'relative'
+                }}>
+                    <button onClick={() => setShowGradingModal(false)} style={{
+                        position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none',
+                        color: '#64748b', fontSize: '1.5rem', cursor: 'pointer'
+                    }}>×</button>
+
+                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--accent-cyan)', letterSpacing: '0.1em', textAlign: 'center' }}>GRADING SCHEME</h3>
+
+                    {/* Policy Selector (if multiple) */}
+                    {currentUni.policies.length > 1 && (
+                        <select
+                            value={activePolicyId}
+                            onChange={(e) => setActivePolicyId(e.target.value)}
+                            style={{
+                                width: '100%',
+                                background: 'rgba(255,255,255,0.05)',
+                                color: 'white',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '8px',
+                                padding: '0.75rem',
+                                fontSize: '0.9rem',
+                                outline: 'none',
+                                cursor: 'pointer',
+                                marginBottom: '1.5rem'
+                            }}
+                        >
+                            {currentUni.policies.map(p => (
+                                <option key={p.id} value={p.id} style={{ background: '#0f172a' }}>{p.name}</option>
+                            ))}
+                        </select>
+                    )}
+
+                    {/* Grade Table */}
+                    <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div>Grade Letter</div>
+                            <div style={{ textAlign: 'right' }}>Point Value</div>
+                        </div>
+                        {currentPolicy?.gradingScale.map((gs, i) => (
+                            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{ color: 'white', fontWeight: 700 }}>{gs.grade}</div>
+                                <div style={{ textAlign: 'right', color: 'var(--accent-cyan)' }}>{gs.point.toFixed(2)}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <button className="btn-ghost" onClick={() => setShowGradingModal(false)} style={{ width: '100%', marginTop: '1.5rem' }}>Close</button>
+                </div>
+            </div>
+        );
+    };
+
+    /* --- CALCULATIONS --- */
     const handleFloatInput = (val: string, setter: (v: string) => void) => {
         if (val === '' || /^\d*\.?\d{0,4}$/.test(val)) {
             const num = parseFloat(val);
@@ -316,6 +414,14 @@ export default function Workspace() {
                         <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--accent-cyan)', letterSpacing: '0.1em' }}>CONFIGURE SYSTEM</h3>
                         <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '1.5rem' }}>Define your university's grading scale manually.</p>
 
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Quick Preset</div>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button onClick={() => handlePreset('4.0')} style={{ flex: 1, padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem' }}>Standard 4.0</button>
+                                <button onClick={() => handlePreset('5.0')} style={{ flex: 1, padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem' }}>Scale 5.0</button>
+                            </div>
+                        </div>
+
                         <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '0.5rem', marginBottom: '1rem' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 40px', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase' }}>
                                 <div>Grade Letter</div>
@@ -388,57 +494,18 @@ export default function Workspace() {
                             {currentUni.name}
                             {currentUni.shortName && <span style={{ opacity: 0.7, marginLeft: '0.4rem', fontWeight: 400, fontSize: '0.9em' }}>({currentUni.shortName})</span>}
                         </h1>
-                        <div style={{ fontSize: '0.7rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.8 }}>
-                            <span style={{ fontSize: '0.8rem' }}>↺</span> Change Architecture
+                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.7rem' }}>
+                            <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.8 }}>
+                                <span style={{ fontSize: '0.8rem' }}>↺</span> Change
+                            </div>
+                            <div onClick={(e) => { e.stopPropagation(); setShowGradingModal(true); }} style={{ color: 'var(--accent-cyan)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <span style={{ fontSize: '0.8rem' }}>👁</span> Grading Scale
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {currentUni.policies.length > 1 && (
-                    <div style={{ margin: '-1.5rem 1.5rem 2rem 1.5rem' }}>
-                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Grading Scheme</div>
-                        <select
-                            value={activePolicyId}
-                            onChange={(e) => setActivePolicyId(e.target.value)}
-                            style={{
-                                width: '100%',
-                                background: 'rgba(255,255,255,0.05)',
-                                color: 'white',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '8px',
-                                padding: '0.5rem',
-                                fontSize: '0.75rem',
-                                outline: 'none',
-                                cursor: 'pointer',
-                                marginBottom: '0.75rem'
-                            }}
-                        >
-                            {currentUni.policies.map(p => (
-                                <option key={p.id} value={p.id} style={{ background: '#0f172a' }}>{p.name}</option>
-                            ))}
-                        </select>
 
-                        {/* SCALE PREVIEW (Mini-Legend) */}
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, 1fr)',
-                            gap: '0.25rem',
-                            background: 'rgba(0,0,0,0.2)',
-                            padding: '0.5rem',
-                            borderRadius: '6px',
-                            border: '1px solid rgba(255,255,255,0.05)'
-                        }}>
-                            {currentPolicy?.gradingScale.slice(0, 9).map((gs, i) => (
-                                <div key={i} style={{ fontSize: '0.6rem', color: i < 3 ? 'var(--accent-cyan)' : '#64748b' }}>
-                                    <span style={{ fontWeight: 700 }}>{gs.grade}</span> <span style={{ opacity: 0.7 }}>{gs.point.toFixed(2)}</span>
-                                </div>
-                            ))}
-                            {currentPolicy && currentPolicy.gradingScale.length > 9 && (
-                                <div style={{ fontSize: '0.6rem', color: '#64748b', fontStyle: 'italic' }}>...</div>
-                            )}
-                        </div>
-                    </div>
-                )}
 
                 {isCustomMode && (
                     <div style={{ margin: '-1.5rem 1.5rem 2rem 1.5rem' }}>
@@ -600,6 +667,7 @@ export default function Workspace() {
                         <button onClick={handleAddCourse} className="btn-primary" style={{ marginTop: '1rem' }}>+ {TEXT.MESSAGES.ADD_COURSE}</button>
                     )}
                 </div>
+                <GradingModal />
             </main>
 
             {/* RIGHT: IMPACT ANALYSIS */}
