@@ -110,11 +110,11 @@ export default function LandingPage() {
                             background: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url(${uni.imageUrl}) center/cover`
                         }}></div>
                         <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left', zIndex: 2 }}>
-                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1.1rem', lineHeight: '1.3', color: '#f8fafc', marginBottom: '0.5rem', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                            <div className="uni-name">
                                 {uni.name}
                                 {uni.shortName && <span style={{ opacity: 0.7, fontWeight: 400, marginLeft: '0.4rem', fontSize: '0.9em' }}>({uni.shortName})</span>}
                             </div>
-                            <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.75rem', color: '#94a3b8', letterSpacing: '0.05em' }}>{uni.country.toUpperCase()}</div>
+                            <div className="uni-country">{uni.country.toUpperCase()}</div>
                         </div>
                     </div>
                 ))}
