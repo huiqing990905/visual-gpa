@@ -249,6 +249,7 @@ export const Workspace = () => {
                 <meta name="keywords" content={getSeoKeywords()} />
                 <meta property="og:title" content={`${currentUni?.name} ${currentUni?.shortName ? `(${currentUni?.shortName})` : ''} CGPA Calculator`} />
                 <meta property="og:description" content={`Plan course scenarios for${currentUni?.shortName ? ` ${currentUni?.shortName}` : ''} and visualize grading outcomes.`} />
+                <link rel="canonical" href={`https://visualgpa.app/${currentUni.id}`} />
             </Helmet>
 
             {/* CUSTOM CONFIRM MODAL */}
