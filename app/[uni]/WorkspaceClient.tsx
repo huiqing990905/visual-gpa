@@ -252,7 +252,7 @@ export default function Workspace() {
     if (!mounted || !currentUni) return null;
 
     return (
-        <div className="app-shell" style={{ height: '100vh', display: 'flex' }}>
+        <div className="app-shell">
             {/* Metadata is now handled by generateMetadata in layout or page wrapper */}
 
             {/* CUSTOM CONFIRM MODAL */}
@@ -281,8 +281,28 @@ export default function Workspace() {
                         <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '1rem', lineHeight: '1.5' }}>
                             {TEXT.ABOUT_MODAL.CONTACT_MSG}
                         </div>
-                        <div style={{ fontFamily: 'var(--font-tech)', background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '8px', textAlign: 'center', color: 'white', marginBottom: '2rem', letterSpacing: '0.05em' }}>
-                            {TEXT.ABOUT_MODAL.EMAIL}
+                        <div className="contact-grid">
+                            <a href={`mailto:${TEXT.ABOUT_MODAL.EMAIL}`} className="contact-link-card">
+                                <span className="contact-icon">✉️</span>
+                                <div className="contact-text-group">
+                                    <span className="contact-label">Email</span>
+                                    <span className="contact-value">{TEXT.ABOUT_MODAL.EMAIL}</span>
+                                </div>
+                            </a>
+                            <a href={TEXT.ABOUT_MODAL.INSTAGRAM} target="_blank" rel="noopener noreferrer" className="contact-link-card">
+                                <span className="contact-icon">📸</span>
+                                <div className="contact-text-group">
+                                    <span className="contact-label">Instagram</span>
+                                    <span className="contact-value">@hqing0905</span>
+                                </div>
+                            </a>
+                            <a href={TEXT.ABOUT_MODAL.LINKEDIN} target="_blank" rel="noopener noreferrer" className="contact-link-card">
+                                <span className="contact-icon">💼</span>
+                                <div className="contact-text-group">
+                                    <span className="contact-label">LinkedIn</span>
+                                    <span className="contact-value">Hui Qing Lau</span>
+                                </div>
+                            </a>
                         </div>
                         <button className="btn-ghost" onClick={() => setShowAboutModal(false)} style={{ width: '100%' }}>{TEXT.ABOUT_MODAL.CLOSE}</button>
                     </div>

@@ -110,7 +110,9 @@ export const TEXT = {
         TITLE: "About VisualGPA",
         DISCLAIMER: "This project is independently maintained. It serves as a planning tool only and does not provide official academic advice or verification of university records.",
         CONTACT_MSG: "For feedback, corrections, or policy references only, you may contact the maintainer at:",
-        EMAIL: "contact@visualgpa.app",
+        EMAIL: "qing05099@gmail.com",
+        LINKEDIN: "https://www.linkedin.com/in/hui-qing-lau-208a4222a/",
+        INSTAGRAM: "https://www.instagram.com/hqing0905/",
         CLOSE: "Close"
     },
     TRANSPARENCY: {

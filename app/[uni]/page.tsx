@@ -3,8 +3,8 @@ import WorkspaceClient from './WorkspaceClient';
 import { sampleUniversities } from '../../src/data/sample';
 import { TEXT } from '../../src/text';
 
-export async function generateMetadata({ params }: { params: { uni: string } }): Promise<Metadata> {
-    const uniId = params.uni;
+export async function generateMetadata({ params }: { params: Promise<{ uni: string }> }): Promise<Metadata> {
+    const { uni: uniId } = await params;
     const uni = sampleUniversities.find((u) => u.id === uniId);
     const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
 

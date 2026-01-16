@@ -40,9 +40,7 @@ export default function RootLayout({
                 <link rel="icon" type="image/svg+xml" href="/vite.svg" />
             </head>
             <body>
-                <div id="root" className="app-shell">
-                    {children}
-                </div>
+                {children}
             </body>
         </html>
     );

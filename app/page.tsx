@@ -14,6 +14,16 @@ export default function LandingPage() {
 
     return (
         <div className="landing-hero">
+            <img
+                src="/logo.png"
+                alt="VisualGPA Logo"
+                style={{
+                    width: '100px',
+                    height: '100px',
+                    marginBottom: '2rem',
+                    filter: 'drop-shadow(0 0 30px rgba(34, 211, 238, 0.4))'
+                }}
+            />
             <h1 className="landing-title" style={{ lineHeight: '1', marginBottom: '1rem', letterSpacing: '-0.03em', textAlign: 'center' }}>{TEXT.BRAND.NAME.toUpperCase()}</h1>
             <p style={{ color: 'var(--accent-cyan)', letterSpacing: '0.2em', marginBottom: '4rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600, textAlign: 'center' }}>{TEXT.BRAND.TAGLINE}</p>
             <p style={{ color: '#94a3b8', letterSpacing: '0.1em', marginBottom: '1rem', fontSize: '0.85rem' }}>{TEXT.BRAND.SELECT_ARCH}</p>
