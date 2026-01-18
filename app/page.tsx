@@ -162,6 +162,32 @@ export default function LandingPage() {
                 </button>
             )}
 
+            <div style={{ width: '100%', maxWidth: '1400px', marginTop: '4rem', padding: '0 1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', opacity: 0.6 }}>
+                    <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to right, transparent, white)' }}></div>
+                    <span style={{ fontFamily: 'var(--font-tech)', fontSize: '0.9rem', letterSpacing: '0.2em' }}>OR</span>
+                    <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to left, transparent, white)' }}></div>
+                </div>
+
+                <div
+                    onClick={() => handleUniversitySelect('custom')}
+                    className="custom-arch-card"
+                >
+                    <div className="custom-arch-content">
+                        <div className="custom-arch-icon"></div>
+                        <div style={{ textAlign: 'left', flex: 1 }}>
+                            <div className="custom-arch-title">Custom Architecture</div>
+                            <div className="custom-arch-desc">
+                                Not in the list? Define your own grading scale and university parameters manually.
+                            </div>
+                        </div>
+                    </div>
+                    <div className="custom-arch-action">
+                        INITIALIZE &rarr;
+                    </div>
+                </div>
+            </div>
+
             {/* FEATURES GRID */}
             <div className="feature-grid">
                 {TEXT.LANDING_FEATURES.map((feat, idx) => (
