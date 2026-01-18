@@ -107,18 +107,18 @@ export const TEXT = {
     },
     LANDING_FEATURES: [
         {
-            TITLE: "Privacy First",
-            DESC: "100% Client-side. Your academic data never leaves your device. No login required.",
+            TITLE: "Strategic Sandbox",
+            DESC: "Your private command center. 100% local data. Simulate risky scenarios without consequences.",
             ICON: "/feature_privacy.png"
         },
         {
-            TITLE: "Visual Analytics",
-            DESC: "Don't just calculate numbers. See your GPA trends and understand the impact of every grade.",
+            TITLE: "Gap Analysis",
+            DESC: "Quantify the gap. Don't just watch your GPA; calculate exactly what grades you need to bridge it.",
             ICON: "/feature_analytics.png"
         },
         {
-            TITLE: "Scenario Planning",
-            DESC: "Simulate future semesters. What happens if you score all A's? Find out instantly.",
+            TITLE: "Predictive Simulation",
+            DESC: "Forecast the future. Pre-calculate outcomes for 'Best Case', 'Worst Case', and everything in between.",
             ICON: "/feature_scenario.png"
         }
     ],

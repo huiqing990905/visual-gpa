@@ -126,6 +126,69 @@ export const sampleUniversities: University[] = [
         ]
     },
     {
+        id: 'taylors',
+        name: "Taylor's University",
+        shortName: "Taylor's",
+        country: 'Malaysia',
+        type: 'Private',
+        imageUrl: '/taylors_university.svg',
+        policies: [
+            {
+                id: 'pol_taylors_1',
+                universityId: 'taylors',
+                name: "Taylor's Grading Scheme",
+                effectiveFrom: '2024-01-01',
+                repeatPolicy: 'LatestAttempt',
+                roundingPrecision: 2,
+                maxCGPA: 4.0,
+                gradingScale: [
+                    { grade: 'A', point: 4.00 },
+                    { grade: 'A-', point: 3.67 },
+                    { grade: 'B+', point: 3.33 },
+                    { grade: 'B', point: 3.00 },
+                    { grade: 'B-', point: 2.67 },
+                    { grade: 'C+', point: 2.33 },
+                    { grade: 'C', point: 2.00 },
+                    { grade: 'D+', point: 1.67 },
+                    { grade: 'D', point: 1.33 },
+                    { grade: 'D-', point: 1.00 },
+                    { grade: 'F', point: 0.00 }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'help',
+        name: 'HELP University',
+        shortName: 'HELP',
+        country: 'Malaysia',
+        type: 'Private',
+        imageUrl: '/help_university.png',
+        policies: [
+            {
+                id: 'pol_help_1',
+                universityId: 'help',
+                name: 'Standard Grading Scheme',
+                effectiveFrom: '2024-01-01',
+                repeatPolicy: 'LatestAttempt',
+                roundingPrecision: 2,
+                maxCGPA: 4.0,
+                gradingScale: [
+                    { grade: 'A', point: 4.00 },
+                    { grade: 'A-', point: 3.75 },
+                    { grade: 'B+', point: 3.50 },
+                    { grade: 'B', point: 3.25 },
+                    { grade: 'B-', point: 3.00 },
+                    { grade: 'C+', point: 2.75 },
+                    { grade: 'C', point: 2.50 },
+                    { grade: 'C-', point: 2.25 },
+                    { grade: 'D', point: 2.00 },
+                    { grade: 'F', point: 0.00 }
+                ]
+            }
+        ]
+    },
+    {
         id: 'custom',
         name: 'Custom Architecture',
         country: 'Global',
