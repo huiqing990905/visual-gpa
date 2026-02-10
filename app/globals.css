@@ -90,13 +90,15 @@ body {
   font-family: var(--font-display);
   overflow-x: hidden;
   min-height: 100vh;
-  /* Aurora Background */
+  /* Aurora Background - Simplified */
   background:
-    radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 90% 90%, rgba(192, 132, 252, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 15% 15%, rgba(34, 211, 238, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(192, 132, 252, 0.08) 0%, transparent 40%),
     #030305;
-  background-size: 150% 150%;
-  animation: auroraDrift 20s infinite alternate ease-in-out;
+  background-size: 100% 100%;
+  /* Static size to reduce motion perception */
+  animation: none;
+  /* Stop the drift for a calmer feel */
 }
 
 @keyframes auroraDrift {
@@ -196,15 +198,18 @@ body {
 .step-label {
   font-family: var(--font-tech);
   font-size: 0.65rem;
-  color: #f8fafc;
-  /* Pure White */
+  color: #fff;
+  /* Pure white for max clarity */
   letter-spacing: 0.2em;
   text-transform: uppercase;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  opacity: 0.8;
+  opacity: 0.9;
+  /* Increased from 0.8 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  /* Lift off background */
 }
 
 .step-label::before {
@@ -254,13 +259,17 @@ body {
 /* Standard Label Tech */
 .label-tech {
   font-family: var(--font-tech);
-  font-size: 0.65rem;
-  color: #94a3b8;
-  /* Brighter Slate 400 */
+  font-size: 0.7rem;
+  /* Slightly larger */
+  font-weight: 600;
+  /* Bolder */
+  color: #cbd5e1;
+  /* Slate 300 - much brighter than 400 */
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
   display: block;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .input-super {
@@ -284,8 +293,10 @@ body {
 }
 
 .input-super::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  /* Significantly more visible */
   font-size: 1.2rem;
+  font-weight: 500;
 }
 
 /* GUIDANCE TIP */
@@ -411,8 +422,10 @@ body {
   font-family: var(--font-display);
   font-size: 1.1rem;
   /* Larger text */
-  font-weight: 500;
+  font-weight: 600;
+  /* Bolder input text */
   width: 100%;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .input-ghost:focus {
@@ -430,8 +443,8 @@ body {
   background: rgba(255, 255, 255, 0.08);
   /* More visible BG */
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #cbd5e1;
-  /* Brighter text (Slate-300) */
+  color: #e2e8f0;
+  /* Slate 200 - Very bright */
   font-family: var(--font-tech);
   font-size: 0.7rem;
   /* Larger font */

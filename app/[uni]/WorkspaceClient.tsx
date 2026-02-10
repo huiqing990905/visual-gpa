@@ -394,15 +394,15 @@ export default function Workspace() {
                 </button>
 
                 <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.2rem', color: 'white', lineHeight: 1 }}>{currentUni.name}</div>
-                    <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>VISUAL GPA PLANNER</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.2rem', color: 'white', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{currentUni.name}</div>
+                    <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.75rem', color: '#cbd5e1', marginTop: '0.25rem', fontWeight: 600, letterSpacing: '0.05em' }}>VISUAL GPA PLANNER</div>
                 </div>
             </header>
 
             {/* 2. Context Inputs (Subdued / Parameters) */}
             <div className="context-bar" style={{ background: 'transparent', border: 'none', padding: '1rem 0', gap: '1.5rem', opacity: 0.8 }}>
                 <div className="context-input-group">
-                    <span className="context-label" style={{ fontSize: '0.65rem', color: '#64748b' }}>Baseline CGPA</span>
+                    <span className="context-label" style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 600, letterSpacing: '0.05em' }}>Baseline CGPA</span>
                     <input
                         className="context-input"
                         placeholder="—"
@@ -412,7 +412,7 @@ export default function Workspace() {
                     />
                 </div>
                 <div className="context-input-group">
-                    <span className="context-label" style={{ fontSize: '0.65rem', color: '#64748b' }}>Credits</span>
+                    <span className="context-label" style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 600, letterSpacing: '0.05em' }}>Credits</span>
                     <input
                         className="context-input"
                         placeholder="—"
@@ -423,7 +423,7 @@ export default function Workspace() {
                 </div>
                 <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.1)' }}></div>
                 <div className="context-input-group">
-                    <span className="context-label" style={{ fontSize: '0.65rem', color: '#64748b' }}>Goal</span>
+                    <span className="context-label" style={{ fontSize: '0.7rem', color: '#cbd5e1', fontWeight: 600, letterSpacing: '0.05em' }}>Goal</span>
                     <input
                         className="context-input"
                         placeholder="—"
@@ -443,7 +443,7 @@ export default function Workspace() {
                         <div style={{ fontSize: '1.5rem', fontWeight: 600, color: 'white', marginBottom: '1rem' }}>
                             {isMaxState ? "You've reached perfection." : "Let's plan your next semester."}
                         </div>
-                        <p style={{ color: '#94a3b8', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                        <p style={{ color: '#cbd5e1', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem', lineHeight: '1.6', fontSize: '0.95rem' }}>
                             {isMaxState ? "Try experimenting with 'What If' scenarios." : "Add courses to see how they impact your CGPA in real-time."}
                         </p>
                         <button onClick={handleAddCourse} className="btn-primary">
@@ -503,12 +503,12 @@ export default function Workspace() {
 
                         <div className={`gpa-hero ${diff < 0 ? 'trending-neutral' : ''}`} style={{ fontSize: '3rem', marginBottom: '0.5rem', fontWeight: 600, color: 'white' }}>
                             {/* Use standard text for numbers to reduce "score" feel */}
-                            {result.cgpa > 0 ? result.cgpa.toFixed(2) : "—"}
+                            {result.cgpa > 0 ? result.cgpa.toFixed(4) : "—"}
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', opacity: 0.8 }}>
                             <span style={{ color: trendColor, fontSize: '1rem' }}>{arrowSymbol}</span>
-                            <span style={{ color: '#94a3b8', fontFamily: 'var(--font-tech)', fontSize: '0.8rem' }}>{Math.abs(diff).toFixed(2)} impact</span>
+                            <span style={{ color: '#94a3b8', fontFamily: 'var(--font-tech)', fontSize: '0.8rem' }}>{Math.abs(diff).toFixed(4)} impact</span>
                         </div>
 
 
@@ -529,9 +529,9 @@ export default function Workspace() {
             {/* Footer Items */}
             <footer style={{ marginTop: '4rem', paddingBottom: '2rem', textAlign: 'center', fontSize: '0.8rem', color: '#64748b' }}>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1rem' }}>
-                    <span style={{ cursor: 'pointer' }} onClick={() => setShowAboutModal(true)}>About</span>
-                    <span style={{ cursor: 'pointer' }} onClick={() => setShowLegalModal(true)}>Privacy</span>
-                    {isCustomMode && <span style={{ cursor: 'pointer' }} onClick={() => setShowConfigModal(true)}>Config</span>}
+                    <span style={{ cursor: 'pointer', color: '#cbd5e1', fontWeight: 500 }} onClick={() => setShowAboutModal(true)}>About</span>
+                    <span style={{ cursor: 'pointer', color: '#cbd5e1', fontWeight: 500 }} onClick={() => setShowLegalModal(true)}>Privacy</span>
+                    {isCustomMode && <span style={{ cursor: 'pointer', color: '#cbd5e1', fontWeight: 500 }} onClick={() => setShowConfigModal(true)}>Config</span>}
                 </div>
                 {courses.length > 0 && (
                     <div onClick={() => setShowClearConfirm(true)} style={{ color: '#ef4444', cursor: 'pointer', marginTop: '1rem', opacity: 0.6 }}>
