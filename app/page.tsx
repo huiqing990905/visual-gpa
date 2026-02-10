@@ -1,18 +1,30 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { sampleUniversities } from '../src/data/sample';
 import { TEXT } from '../src/text';
 
+import { DemoPlaceholder } from '../src/components/DemoPlaceholder';
+
 export default function LandingPage() {
     const router = useRouter();
-    const [showLegal, setShowLegal] = (typeof window !== 'undefined') ? require('react').useState(false) : [false, () => { }];
-    const [showContact, setShowContact] = (typeof window !== 'undefined') ? require('react').useState(false) : [false, () => { }];
+    const [showLegal, setShowLegal] = useState(false);
+    const [showContact, setShowContact] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleUniversitySelect = (id: string) => {
         router.push(`/${id}`);
     };
+
+    // Filter Logic
+    const filteredUniversities = sampleUniversities.filter(uni => {
+        const matchesSearch = uni.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (uni.shortName && uni.shortName.toLowerCase().includes(searchTerm.toLowerCase()));
+        return matchesSearch && uni.id !== 'custom';
+    });
+
+    const filteredUnis = filteredUniversities;
 
     // Simple Legal Modal Component
     const LegalModal = () => {
@@ -84,135 +96,232 @@ export default function LandingPage() {
         );
     };
 
-
-
-    // Search & Filter State
-    const [searchTerm, setSearchTerm] = (typeof window !== 'undefined') ? require('react').useState('') : ['', () => { }];
-    const [visibleLimit, setVisibleLimit] = (typeof window !== 'undefined') ? require('react').useState(8) : [8, () => { }];
-
-    // Filter Logic
-    const filteredUniversities = sampleUniversities.filter(uni => {
-        const matchesSearch = uni.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (uni.shortName && uni.shortName.toLowerCase().includes(searchTerm.toLowerCase()));
-        return matchesSearch && uni.id !== 'custom'; // Custom is handled separately at the bottom
-    });
-
-    const displayedUniversities = filteredUniversities.slice(0, visibleLimit);
-    const hasMore = filteredUniversities.length > visibleLimit;
-
     return (
-        <div className="landing-hero">
-            <img
-                src="/logo.svg"
-                alt="VisualGPA Logo"
-                className="landing-logo"
-            />
+        <div className="landing-container">
+            {/* Minimal Header */}
+            <header style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '1.5rem 2rem',
+                maxWidth: '1200px',
+                margin: '0 auto',
+                width: '100%'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                    {/* Logo Image */}
+                    <img
+                        src="/logo.png"
+                        alt="VisualGPA Logo"
+                        style={{ height: '32px', width: 'auto' }}
+                    />
+                    <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'white', letterSpacing: '-0.02em' }}>
+                        VisualGPA
+                    </span>
+                </div>
+            </header>
 
-            <h1 className="landing-title">
-                {TEXT.BRAND.NAME}
-            </h1>
+            <main style={{
+                maxWidth: '1000px',
+                margin: '0 auto',
+                padding: '3rem 1.5rem', // Reduced top padding
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center'
+            }}>
 
-            <div className="landing-tagline">
-                {TEXT.BRAND.TAGLINE}
-            </div>
+                {/* 1. Primary Action Hierarchy - Compressed */}
+                <h1 style={{
+                    fontSize: '3rem', // Slightly smaller
+                    fontWeight: 800,
+                    lineHeight: '1.1',
+                    marginBottom: '1rem', // Tighter spacing
+                    letterSpacing: '-0.02em',
+                    maxWidth: '800px'
+                }}>
+                    Plan your CGPA <br />
+                    <span style={{ color: 'var(--accent-cyan)' }}>before next semester</span>
+                </h1>
 
-            {/* Search Section */}
-            <div className="search-container">
-                <div className="glass-search-bar">
-                    <span className="search-icon">🔍</span>
+                <p style={{
+                    fontSize: '1.15rem',
+                    color: '#94a3b8',
+                    marginBottom: '2rem', // Tighter spacing
+                    maxWidth: '600px',
+                    lineHeight: '1.5'
+                }}>
+                    Select your university to start. No signup required.
+                </p>
+
+                {/* 2. Central Search Input - Enhanced Focus */}
+                <div style={{
+                    width: '100%',
+                    maxWidth: '600px',
+                    position: 'relative',
+                    marginBottom: '2rem'
+                }}>
                     <input
+                        autoFocus // Immediate interaction
                         type="text"
                         placeholder="Search your university..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="glass-search-input"
+                        style={{
+                            width: '100%',
+                            padding: '1.15rem 1.5rem', // Slightly tighter
+                            fontSize: '1.1rem',
+                            background: 'rgba(255,255,255,0.08)', // Slightly higher contrast
+                            border: '1px solid rgba(255,255,255,0.15)', // Stronger border
+                            borderRadius: '12px',
+                            color: 'white',
+                            outline: 'none',
+                            transition: 'all 0.2s ease',
+                            boxShadow: '0 4px 24px rgba(0,0,0,0.3)' // Subtle lift
+                        }}
+                        onFocus={(e) => {
+                            e.target.style.background = 'rgba(255,255,255,0.12)';
+                            e.target.style.borderColor = 'var(--accent-cyan)';
+                        }}
+                        onBlur={(e) => {
+                            e.target.style.background = 'rgba(255,255,255,0.08)';
+                            e.target.style.borderColor = 'rgba(255,255,255,0.15)';
+                        }}
                     />
+                    <div style={{
+                        position: 'absolute',
+                        right: '1rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        color: 'rgba(255,255,255,0.4)',
+                        fontSize: '0.9rem',
+                        pointerEvents: 'none'
+                    }}>
+                        Press Enter ↵
+                    </div>
                 </div>
-            </div>
 
-            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem auto', lineHeight: '1.5' }}>
-                {filteredUniversities.length} Architecture{filteredUniversities.length !== 1 ? 's' : ''} Available
-            </p>
-
-            <div className="uni-orbit">
-                {displayedUniversities.map(uni => (
-                    <div key={uni.id} className="uni-planet" onClick={() => handleUniversitySelect(uni.id)}>
-                        <div className="uni-img" style={{
-                            background: `linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%), url(${uni.imageUrl}) center/cover`
-                        }}>
-
-                        </div>
-                        <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left', zIndex: 2 }}>
-                            <div className="uni-name">
-                                {uni.name}
-                                {uni.shortName && <span style={{ opacity: 0.7, fontWeight: 400, marginLeft: '0.4rem', fontSize: '0.9em' }}>({uni.shortName})</span>}
+                {/* 3. University List - Quick Start Shortcuts */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', // Tighter density
+                    gap: '0.75rem', // Tighter grid
+                    width: '100%',
+                    maxWidth: '800px',
+                    marginBottom: '2rem' // Reduced bottom margin to connect with custom option
+                }}>
+                    {filteredUnis.map((uni) => (
+                        <div
+                            key={uni.id}
+                            onClick={() => router.push(`/${uni.id}`)}
+                            style={{
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                borderRadius: '10px',
+                                padding: '1rem', // Reduced padding
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                transition: 'all 0.15s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                            }}
+                        >
+                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <div style={{ fontWeight: 500, fontSize: '0.95rem', color: 'white' }}>{uni.name}</div>
                             </div>
-                            <div className="uni-country">{uni.country.toUpperCase()}</div>
+                            <div style={{ color: 'var(--accent-cyan)', opacity: 0.6, fontSize: '1.2rem', marginLeft: '0.5rem' }}>›</div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
 
-            {hasMore && (
-                <button
-                    className="load-more-btn"
-                    onClick={() => setVisibleLimit((prev: number) => prev + 8)}
-                >
-                    Load More
-                </button>
-            )}
-
-            <div style={{ width: '100%', maxWidth: '1400px', marginTop: '4rem', padding: '0 1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', opacity: 0.6 }}>
-                    <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to right, transparent, white)' }}></div>
-                    <span style={{ fontFamily: 'var(--font-tech)', fontSize: '0.9rem', letterSpacing: '0.2em' }}>OR</span>
-                    <div style={{ height: '1px', flex: 1, background: 'linear-gradient(to left, transparent, white)' }}></div>
+                    {filteredUnis.length === 0 && (
+                        <div style={{ gridColumn: '1 / -1', padding: '2rem', color: '#64748b' }}>
+                            University not found. <br /> <a href="#" style={{ color: 'var(--accent-cyan)' }}>Request it here.</a>
+                        </div>
+                    )}
                 </div>
 
-                <div
-                    onClick={() => handleUniversitySelect('custom')}
-                    className="custom-arch-card"
-                >
-                    <div className="custom-arch-content">
-                        <div className="custom-arch-icon"></div>
-                        <div style={{ textAlign: 'left', flex: 1 }}>
-                            <div className="custom-arch-title">Custom Architecture</div>
-                            <div className="custom-arch-desc">
-                                Not in the list? Define your own grading scale and university parameters manually.
-                            </div>
+                {/* 3b. Secondary/Fallback Action - Custom Architecture */}
+                <div style={{
+                    marginBottom: '4rem',
+                    color: '#64748b',
+                    fontSize: '0.9rem'
+                }}>
+                    Don't see your university?{' '}
+                    <span
+                        onClick={() => handleUniversitySelect('custom')}
+                        style={{
+                            color: '#94a3b8',
+                            textDecoration: 'underline',
+                            cursor: 'pointer',
+                            textUnderlineOffset: '4px',
+                            transition: 'color 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
+                    >
+                        Configure a custom grading architecture
+                    </span>
+                </div>
+
+                {/* 4. Secondary Content - Outcome Focused */}
+                <div style={{
+                    width: '100%',
+                    maxWidth: '900px',
+                    marginTop: '0', // Removed gap to demo
+                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    paddingTop: '3rem'
+                }}>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '3rem',
+                        alignItems: 'center',
+                        textAlign: 'left'
+                    }}>
+                        <div>
+                            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', fontWeight: 600, color: 'white' }}>
+                                Predict your future
+                            </h3>
+                            <p style={{ color: '#94a3b8', lineHeight: '1.5', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+                                See exactly how your CGPA changes when you adjust next semester’s grades.
+                                Make data-driven decisions about your coursework.
+                            </p>
+                            <a
+                                href="/__sample__"
+                                className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                            >
+                                Try with sample data →
+                            </a>
                         </div>
-                    </div>
-                    <div className="custom-arch-action">
-                        INITIALIZE &rarr;
+
+                        {/* Demo Placeholder (Secondary) */}
+                        <div style={{ transform: 'scale(0.9)', transformOrigin: 'top right', opacity: 0.9 }}>
+                            <DemoPlaceholder />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* FEATURES GRID */}
-            <div className="feature-grid">
-                {TEXT.LANDING_FEATURES.map((feat, idx) => (
-                    <div key={idx} className="feature-card">
-                        <div className="feature-icon" style={{ background: 'transparent', padding: 0 }}>
-                            <img src={feat.ICON} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(34,211,238,0.3))' }} />
-                        </div>
-                        <div className="feature-text">
-                            <div className="feature-title">{feat.TITLE}</div>
-                            <div className="feature-desc">{feat.DESC}</div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            </main>
 
-            {/* FOOTER */}
-            <footer className="landing-footer">
+            {/* Footer */}
+            <footer className="landing-footer" style={{ marginTop: 'auto', padding: '2rem', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
                 <div className="footer-nav">
                     <span className="footer-link" onClick={() => setShowLegal(true)}>{TEXT.FOOTER.LEGAL}</span>
                     <span className="footer-link" onClick={() => setShowContact(true)}>{TEXT.FOOTER.CONTACT}</span>
                 </div>
-                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)' }}>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)', marginTop: '1rem' }}>
                     {TEXT.FOOTER.DISCLAIMER}
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', opacity: 0.5 }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', opacity: 0.5, marginTop: '0.5rem' }}>
                     © {new Date().getFullYear()} {TEXT.BRAND.NAME}. All rights reserved.
                 </div>
             </footer>

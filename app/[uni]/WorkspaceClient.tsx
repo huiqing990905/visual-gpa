@@ -7,18 +7,40 @@ import { calculateProjectedCGPA } from '../../src/logic/calculator';
 import { TEXT } from '../../src/text';
 import type { Course } from '../../src/types';
 import { AnimatedValue } from '../../src/components/AnimatedValue';
+import { getNextAction } from '../../src/logic/resources';
+import { NextActions } from '../../src/components/NextActions';
+import { FormulaModal } from '../../src/components/modals/FormulaModal';
 
 export default function Workspace() {
     // Next.js params can be array or string, so we force cast or handle it.
     // In app/[uni]/page.tsx, params.uni is the dynamic segment.
     const params = useParams();
     const uniId = params.uni as string;
+    const isSample = uniId === '__sample__';
 
     // Router replacement
     const router = useRouter();
 
+    // Find current university or create mock for sample
     // Find current university
-    const currentUni = sampleUniversities.find(u => u.id === uniId);
+    const currentUni = isSample ? {
+        id: '__sample__',
+        name: 'Sample University',
+        shortName: 'Demo',
+        country: 'Global',
+        type: 'Public',
+        imageUrl: '/custom_mode.png',
+        policies: [{
+            id: 'pol_sample',
+            name: 'Standard 4.0 Scale',
+            gradingScale: [
+                { grade: 'A', point: 4.0 }, { grade: 'A-', point: 3.7 }, { grade: 'B+', point: 3.3 },
+                { grade: 'B', point: 3.0 }, { grade: 'B-', point: 2.7 }, { grade: 'C+', point: 2.3 },
+                { grade: 'C', point: 2.0 }, { grade: 'F', point: 0.0 }
+            ],
+            maxCGPA: 4.0
+        }]
+    } : sampleUniversities.find(u => u.id === uniId);
 
     // Redirect if invalid ID
     useEffect(() => {
@@ -35,24 +57,18 @@ export default function Workspace() {
     }, [currentUni]);
 
     /* State & Persistence */
-    const [courses, setCourses] = useState<Course[]>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('visualgpa_courses');
-            return saved ? JSON.parse(saved) : [];
-        }
-        return [];
-    });
-
-    // Handle hydration mismatch for localStorage
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const [courses, setCourses] = useState<Course[]>(isSample ? [
+        { id: 's1', code: 'CS101', name: 'Intro to Comp Sci', credits: 4, grade: 'A', semester: 'Y1S1' },
+        { id: 's2', code: 'MATH101', name: 'Calculus I', credits: 4, grade: 'B+', semester: 'Y1S1' },
+        { id: 's3', code: 'ENG102', name: 'Academic English', credits: 3, grade: 'A-', semester: 'Y1S1' },
+        { id: 's4', code: 'CS102', name: 'Data Structures', credits: 4, grade: 'B', semester: 'Y1S2' },
+        { id: 's5', code: 'STAT201', name: 'Statistics', credits: 3, grade: 'A', semester: 'Y1S2' },
+    ] : []);
 
     // Session-only state
-    const [currentCGPA, setCurrentCGPA] = useState<string>('');
-    const [currentTotalCredits, setCurrentTotalCredits] = useState<string>('');
-    const [targetCGPA, setTargetCGPA] = useState<string>('');
+    const [currentCGPA, setCurrentCGPA] = useState<string>(isSample ? '3.42' : '');
+    const [currentTotalCredits, setCurrentTotalCredits] = useState<string>(isSample ? '18' : '');
+    const [targetCGPA, setTargetCGPA] = useState<string>(isSample ? '3.60' : '');
     const [activePolicyId, setActivePolicyId] = useState<string>(''); // Policy Selection
 
     /* UI State */
@@ -61,35 +77,43 @@ export default function Workspace() {
     const [showTransparency, setShowTransparency] = useState(false);
     const [showLegalModal, setShowLegalModal] = useState(false);
 
-
     const [showConfigModal, setShowConfigModal] = useState(false); // New Config Modal
     const [showGradingModal, setShowGradingModal] = useState(false); // Grading Scheme Modal
+    const [showFormulaModal, setShowFormulaModal] = useState(false); // Formula Breakdown Modal
 
     // Custom Grading Scale State
-    const [customGradingScale, setCustomGradingScale] = useState<{ grade: string, point: number }[]>(() => {
-        if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('visualgpa_custom_scale');
-            return saved ? JSON.parse(saved) : [
-                { grade: 'A', point: 4.0 }, { grade: 'B', point: 3.0 }, { grade: 'C', point: 2.0 }, { grade: 'F', point: 0.0 }
-            ];
+    const [customGradingScale, setCustomGradingScale] = useState<{ grade: string, point: number }[]>(
+        [{ grade: 'A', point: 4.0 }, { grade: 'B', point: 3.0 }, { grade: 'C', point: 2.0 }, { grade: 'F', point: 0.0 }]
+    );
+
+    // Initial load from localStorage
+    useEffect(() => {
+        if (!isSample) {
+            const savedCourses = localStorage.getItem('visualgpa_courses');
+            if (savedCourses) setCourses(JSON.parse(savedCourses));
+
+            const savedScale = localStorage.getItem('visualgpa_custom_scale');
+            if (savedScale) setCustomGradingScale(JSON.parse(savedScale));
         }
-        return [
-            { grade: 'A', point: 4.0 }, { grade: 'B', point: 3.0 }, { grade: 'C', point: 2.0 }, { grade: 'F', point: 0.0 }
-        ];
-    });
+    }, [isSample]);
+
+    // Handle hydration mismatch indicator
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
-        if (customGradingScale && typeof window !== 'undefined') localStorage.setItem('visualgpa_custom_scale', JSON.stringify(customGradingScale));
-    }, [customGradingScale]);
+        if (!isSample) localStorage.setItem('visualgpa_courses', JSON.stringify(courses));
+    }, [courses, isSample]);
 
-    /* Effects */
     useEffect(() => {
-        if (typeof window !== 'undefined') localStorage.setItem('visualgpa_courses', JSON.stringify(courses));
-    }, [courses]);
+        if (!isSample) localStorage.setItem('visualgpa_custom_scale', JSON.stringify(customGradingScale));
+    }, [customGradingScale, isSample]);
 
     // Reset policy on uni change
     useEffect(() => {
-        if (currentUni && currentUni.policies.length > 0) {
+        if (currentUni && currentUni.policies && currentUni.policies.length > 0) {
             setActivePolicyId(currentUni.policies[0].id);
         }
     }, [currentUni]);
@@ -104,7 +128,7 @@ export default function Workspace() {
             gradingScale: customGradingScale,
             maxCGPA: Math.max(...customGradingScale.map(g => g.point), 0) || 4.0
         }
-        : (currentUni?.policies.find(p => p.id === activePolicyId) || currentUni?.policies[0]);
+        : (currentUni?.policies ? (currentUni.policies.find(p => p.id === activePolicyId) || currentUni.policies[0]) : undefined);
 
     const gradeOptions = currentPolicy?.gradingScale.map(g => g.grade) || [];
     const maxCGPA = currentPolicy?.maxCGPA || 4.00;
@@ -167,7 +191,7 @@ export default function Workspace() {
                     <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--accent-cyan)', letterSpacing: '0.1em', textAlign: 'center' }}>GRADING SCHEME</h3>
 
                     {/* Policy Selector (if multiple) */}
-                    {currentUni.policies.length > 1 && (
+                    {(currentUni?.policies?.length || 0) > 1 && (
                         <select
                             value={activePolicyId}
                             onChange={(e) => setActivePolicyId(e.target.value)}
@@ -184,7 +208,7 @@ export default function Workspace() {
                                 marginBottom: '1.5rem'
                             }}
                         >
-                            {currentUni.policies.map(p => (
+                            {currentUni?.policies?.map(p => (
                                 <option key={p.id} value={p.id} style={{ background: '#0f172a' }}>{p.name}</option>
                             ))}
                         </select>
@@ -349,9 +373,175 @@ export default function Workspace() {
     // Safe check for render
     if (!mounted || !currentUni) return null;
 
+    // Contextual Next Actions
+    const featuredAction = getNextAction({
+        isSampleMode: isSample,
+        courseCount: courses.length,
+        cgpa: result.cgpa
+    });
+
+
+    // ... logic remains same until return ...
+    // NOTE: This replacement will be partial due to tool limits. I will replace the wrapper first.
+
+    // New notebook layout return structure
     return (
-        <div className="app-shell">
-            {/* Metadata is now handled by generateMetadata in layout or page wrapper */}
+        <div className="notebook-container">
+            {/* 1. Header & Identity */}
+            <header className="notebook-header">
+                <button onClick={() => router.push('/')} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-tech)', fontSize: '0.9rem' }}>
+                    <span>←</span> Home
+                </button>
+
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.2rem', color: 'white', lineHeight: 1 }}>{currentUni.name}</div>
+                    <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>VISUAL GPA PLANNER</div>
+                </div>
+            </header>
+
+            {/* 2. Context Inputs (Subdued / Parameters) */}
+            <div className="context-bar" style={{ background: 'transparent', border: 'none', padding: '1rem 0', gap: '1.5rem', opacity: 0.8 }}>
+                <div className="context-input-group">
+                    <span className="context-label" style={{ fontSize: '0.65rem', color: '#64748b' }}>Baseline CGPA</span>
+                    <input
+                        className="context-input"
+                        placeholder="—"
+                        value={Number(currentCGPA) === 0 ? '' : currentCGPA}
+                        onChange={e => handleFloatInput(e.target.value, setCurrentCGPA)}
+                        style={{ fontSize: '1rem', width: '80px', color: '#94a3b8' }}
+                    />
+                </div>
+                <div className="context-input-group">
+                    <span className="context-label" style={{ fontSize: '0.65rem', color: '#64748b' }}>Credits</span>
+                    <input
+                        className="context-input"
+                        placeholder="—"
+                        value={Number(currentTotalCredits) === 0 ? '' : currentTotalCredits}
+                        onChange={e => handleCreditInput(e.target.value, setCurrentTotalCredits)}
+                        style={{ width: '50px', fontSize: '1rem', color: '#94a3b8' }}
+                    />
+                </div>
+                <div style={{ width: '1px', height: '30px', background: 'rgba(255,255,255,0.1)' }}></div>
+                <div className="context-input-group">
+                    <span className="context-label" style={{ fontSize: '0.65rem', color: '#64748b' }}>Goal</span>
+                    <input
+                        className="context-input"
+                        placeholder="—"
+                        value={Number(targetCGPA) === 0 ? '' : targetCGPA}
+                        onChange={e => handleFloatInput(e.target.value, setTargetCGPA)}
+                        style={{ fontSize: '1rem', width: '80px', color: targetSet ? '#c084fc' : '#475569' }}
+                    />
+                </div>
+            </div>
+
+            {/* 3. Main Stage: Course Input */}
+            <main style={{ flex: 1 }}>
+
+                {/* Empty State */}
+                {courses.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '4rem 0', animation: 'fadeUp 0.5s ease-out' }}>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 600, color: 'white', marginBottom: '1rem' }}>
+                            {isMaxState ? "You've reached perfection." : "Let's plan your next semester."}
+                        </div>
+                        <p style={{ color: '#94a3b8', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                            {isMaxState ? "Try experimenting with 'What If' scenarios." : "Add courses to see how they impact your CGPA in real-time."}
+                        </p>
+                        <button onClick={handleAddCourse} className="btn-primary">
+                            + Add First Course
+                        </button>
+                    </div>
+                )}
+
+                {/* Course List */}
+                <div className="course-list" style={{ padding: 0, overflow: 'visible' }}>
+                    {courses.map((course, idx) => (
+                        <div key={course.id} className="holo-row">
+                            <span style={{ fontFamily: 'var(--font-tech)', color: '#475569', fontSize: '0.8rem' }}>0{idx + 1}</span>
+                            <input
+                                className="input-ghost"
+                                placeholder={TEXT.PLACEHOLDERS.COURSE_NAME}
+                                value={course.code}
+                                maxLength={20}
+                                onChange={e => handleUpdate(course.id, 'code', e.target.value)}
+                            />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontSize: '0.65rem', color: '#64748b' }}>{TEXT.LABELS.CR}</span>
+                                <input
+                                    className="input-ghost"
+                                    type="text"
+                                    value={course.credits}
+                                    onChange={e => handleCourseCreditInput(course.id, e.target.value)}
+                                    style={{ width: '30px', textAlign: 'center', fontSize: '0.9rem' }}
+                                />
+                            </div>
+                            <select
+                                className="grade-pill"
+                                value={course.grade}
+                                onChange={e => handleUpdate(course.id, 'grade', e.target.value)}
+                                style={{ color: getGradeColor(course.grade), fontSize: '0.9rem', padding: '0.25rem' }}
+                            >
+                                {gradeOptions.map(g => <option key={g} value={g}>{g}</option>)}
+                            </select>
+                            <button onClick={() => handleRemove(course.id)} style={{ background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1rem' }}>×</button>
+                        </div>
+                    ))}
+
+                    {courses.length > 0 && (
+                        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                            <button onClick={handleAddCourse} className="btn-primary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px dashed rgba(255,255,255,0.2)', color: '#94a3b8' }}>
+                                + Add Another Course
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* 4. Results (Conditional) */}
+                {hasCourses && (
+                    <div className="result-card-minimal" style={{ marginTop: '4rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2rem', background: 'transparent' }}>
+
+                        <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '1.5rem', opacity: 0.7 }}>Potential Outcome</div>
+
+                        <div className={`gpa-hero ${diff < 0 ? 'trending-neutral' : ''}`} style={{ fontSize: '3rem', marginBottom: '0.5rem', fontWeight: 600, color: 'white' }}>
+                            {/* Use standard text for numbers to reduce "score" feel */}
+                            {result.cgpa > 0 ? result.cgpa.toFixed(2) : "—"}
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', opacity: 0.8 }}>
+                            <span style={{ color: trendColor, fontSize: '1rem' }}>{arrowSymbol}</span>
+                            <span style={{ color: '#94a3b8', fontFamily: 'var(--font-tech)', fontSize: '0.8rem' }}>{Math.abs(diff).toFixed(2)} impact</span>
+                        </div>
+
+
+                        <NextActions
+                            universityName={currentUni?.name || 'Academic'}
+                            context={{
+                                isSampleMode: isSample,
+                                courseCount: courses.length,
+                                cgpa: result.cgpa
+                            }}
+                        />
+
+                    </div>
+                )}
+
+            </main>
+
+            {/* Footer Items */}
+            <footer style={{ marginTop: '4rem', paddingBottom: '2rem', textAlign: 'center', fontSize: '0.8rem', color: '#64748b' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1rem' }}>
+                    <span style={{ cursor: 'pointer' }} onClick={() => setShowAboutModal(true)}>About</span>
+                    <span style={{ cursor: 'pointer' }} onClick={() => setShowLegalModal(true)}>Privacy</span>
+                    {isCustomMode && <span style={{ cursor: 'pointer' }} onClick={() => setShowConfigModal(true)}>Config</span>}
+                </div>
+                {courses.length > 0 && (
+                    <div onClick={() => setShowClearConfirm(true)} style={{ color: '#ef4444', cursor: 'pointer', marginTop: '1rem', opacity: 0.6 }}>
+                        Clear All Data
+                    </div>
+                )}
+            </footer>
+
+            {/* MODALS RATAIN SAME LOGIC */}
+            {/* Keeping the detailed Modals (Config, Legal, About, Confirm) as overlaid portals or absolute elements */}
 
             {/* CUSTOM CONFIRM MODAL */}
             {showClearConfirm && (
@@ -457,6 +647,7 @@ export default function Workspace() {
                     </div>
                 </div>
             )}
+
             {/* LEGAL MODAL */}
             {showLegalModal && (
                 <div className="gl-modal-overlay" onClick={() => setShowLegalModal(false)}>
@@ -480,311 +671,9 @@ export default function Workspace() {
                 </div>
             )}
 
-            {/* SIDEBAR */}
-            <aside className="sidebar">
-                <div className="brand-title">{TEXT.BRAND.NAME}<span style={{ color: 'var(--accent-cyan)' }}>◈</span></div>
-
-                {/* ACTIVE MODULE (University Identity) */}
-                {/* ACTIVE MODULE (University Identity) */}
-                <div className="sidebar-card" onClick={() => router.push('/')}>
-                    <div className="sidebar-card-img" style={{ backgroundImage: `url(${currentUni.imageUrl})` }}></div>
-                    <div className="sidebar-card-content">
-                        <div style={{ fontSize: '0.65rem', color: 'var(--accent-cyan)', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>Active Architecture</div>
-                        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', lineHeight: '1.1', fontWeight: 700, color: 'white', marginBottom: '0.5rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)', margin: '0 0 0.5rem 0' }}>
-                            {currentUni.name}
-                            {currentUni.shortName && <span style={{ opacity: 0.7, marginLeft: '0.4rem', fontWeight: 400, fontSize: '0.9em' }}>({currentUni.shortName})</span>}
-                        </h1>
-                        <div style={{ display: 'flex', gap: '1rem', fontSize: '0.7rem' }}>
-                            <div style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.8 }}>
-                                <span style={{ fontSize: '0.8rem' }}>↺</span> Change
-                            </div>
-                            <div onClick={(e) => { e.stopPropagation(); setShowGradingModal(true); }} style={{ color: 'var(--accent-cyan)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                <span style={{ fontSize: '0.8rem' }}>👁</span> Grading Scale
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                {isCustomMode && (
-                    <div style={{ margin: '-1.5rem 1.5rem 2rem 1.5rem' }}>
-                        <button className="btn-ghost" onClick={() => setShowConfigModal(true)} style={{ width: '100%', border: '1px dashed rgba(255,255,255,0.2)', fontSize: '0.75rem' }}>
-                            ⚙️ Configure System
-                        </button>
-                    </div>
-                )}
-
-                <div className="step-label">{TEXT.STEPS.ONE}</div>
-
-                <div className="config-box" style={{ background: 'transparent', border: 'none', padding: '0 5px', boxShadow: 'none' }}>
-                    <div className="input-group">
-                        <span className="input-label-floating">{TEXT.LABELS.CURRENT_CGPA}</span>
-                        <input
-                            className="input-super"
-                            placeholder="0.00"
-                            value={currentCGPA}
-                            onChange={e => handleFloatInput(e.target.value, setCurrentCGPA)}
-                            autoFocus
-                            style={{ fontSize: '1.7rem', marginBottom: '0.5rem' }}
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <span className="input-label-floating">{TEXT.LABELS.CREDITS_EARNED}</span>
-                        <input
-                            className="input-super"
-                            placeholder="0"
-                            value={currentTotalCredits}
-                            onChange={e => handleCreditInput(e.target.value, setCurrentTotalCredits)}
-                            style={{ fontSize: '1.7rem', marginBottom: '0.5rem' }}
-                        />
-                    </div>
-
-                    <div className="input-group">
-                        <span className="input-label-floating">{TEXT.LABELS.TARGET_GOAL}</span>
-                        <input
-                            className="input-super"
-                            placeholder="4.00"
-                            value={targetCGPA}
-                            onChange={e => handleFloatInput(e.target.value, setTargetCGPA)}
-                            style={{ fontSize: '1.7rem', marginBottom: 0, color: targetSet ? 'var(--accent-purple)' : 'white' }}
-                        />
-                    </div>
-                </div>
-
-                {/* GUIDANCE TIP */}
-                <div className="guidance-tip" style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    alignItems: 'flex-start',
-                    marginTop: 'auto',
-                    paddingTop: '1rem'
-                }}>
-                    {/* Status Icon */}
-                    <div style={{
-                        fontSize: '1.2rem',
-                        color: baselineEstablished ? '#22c55e' : '#f59e0b',
-                        textShadow: baselineEstablished ? '0 0 15px rgba(34, 197, 94, 0.5)' : '0 0 15px rgba(245, 158, 11, 0.5)',
-                        marginTop: '-0.2rem'
-                    }}>
-                        {baselineEstablished ? '✓' : '⚠️'}
-                    </div>
-
-                    <div>
-                        <span style={{ fontFamily: 'var(--font-tech)', fontSize: '0.7rem', color: baselineEstablished ? '#22c55e' : '#f59e0b', letterSpacing: '0.1em', display: 'block', marginBottom: '0.25rem' }}>
-                            {baselineEstablished ? TEXT.LABELS.BASELINE_ESTABLISHED : TEXT.LABELS.SYSTEM_GUIDANCE}
-                        </span>
-                        <div style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: '1.5', opacity: 0.9 }}>
-                            {baselineEstablished
-                                ? TEXT.MESSAGES.GUIDANCE_LOCKED(baselineCGPA.toFixed(2), baselineCredits)
-                                : TEXT.MESSAGES.GUIDANCE_DEFAULT
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                {/* FOOTER */}
-                {/* FOOTER - COMPACT */}
-                <div className="sidebar-footer" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-glass)', display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
-                    <span className="footer-link" onClick={() => setShowAboutModal(true)}>{TEXT.FOOTER.CONTACT}</span>
-                    <span className="footer-link" onClick={() => setShowLegalModal(true)}>Legal & Privacy</span>
-                </div>
-            </aside>
-
-            {/* MAIN CONTENT */}
-            <main className="main-content">
-                <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
-                    <button onClick={() => router.push('/')} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '0.4rem 1rem', borderRadius: '100px', cursor: 'pointer', fontSize: '0.75rem', backdropFilter: 'blur(4px)' }}>✕ Close</button>
-                </div>
-
-                <div className="spacer-center"></div>
-
-                <div style={{ padding: '0 3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '3.5rem' }}>
-                    <div className="step-label" style={{ marginBottom: 0 }}>{TEXT.STEPS.TWO}</div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        {courses.length > 0 && <button className="action-btn-mini" onClick={() => setShowClearConfirm(true)} style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.3)' }}>✖ Clear All</button>}
-                    </div>
-                </div>
-
-                <div className="course-list">
-                    {courses.length === 0 && (
-                        <div style={{ textAlign: 'center', marginTop: '4rem', opacity: 1, padding: '3rem 2rem' }}>
-                            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', marginBottom: '0.5rem', color: 'white', fontWeight: 800, background: 'linear-gradient(180deg, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                                {isMaxState ? TEXT.EMPTY_STATE.MAX_TITLE : TEXT.MESSAGES.EMPTY_STATE_TITLE}
-                            </div>
-                            <div style={{ fontSize: '1rem', color: '#94a3b8', marginBottom: '2.5rem', maxWidth: '400px', margin: '0 auto 2.5rem auto', lineHeight: '1.6' }}>
-                                {isMaxState
-                                    ? TEXT.EMPTY_STATE.MAX_DESC
-                                    : (targetSet
-                                        ? TEXT.MESSAGES.EMPTY_STATE_TARGET(targetVal.toFixed(2))
-                                        : TEXT.MESSAGES.EMPTY_STATE_DEFAULT)
-                                }
-                            </div>
-                            <button onClick={handleAddCourse} className="btn-primary" style={{ maxWidth: '200px', margin: '0 auto' }}>
-                                {isMaxState ? TEXT.EMPTY_STATE.CTA_EXPLORE : TEXT.MESSAGES.ADD_SCENARIO}
-                            </button>
-                        </div>
-                    )}
-
-                    {courses.map((course, idx) => (
-                        <div key={course.id} className="holo-row">
-                            <span style={{ fontFamily: 'var(--font-tech)', color: '#475569', fontSize: '0.8rem' }}>0{idx + 1}</span>
-
-                            <input
-                                className="input-ghost"
-                                placeholder={TEXT.PLACEHOLDERS.COURSE_NAME}
-                                value={course.code}
-                                maxLength={20}
-                                onChange={e => handleUpdate(course.id, 'code', e.target.value)}
-                            />
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span style={{ fontSize: '0.65rem', color: '#64748b' }}>{TEXT.LABELS.CR}</span>
-                                <input
-                                    className="input-ghost"
-                                    type="text"
-                                    value={course.credits}
-                                    onChange={e => handleCourseCreditInput(course.id, e.target.value)}
-                                    style={{ width: '30px', textAlign: 'center', fontSize: '0.9rem' }}
-                                />
-                            </div>
-
-                            <select
-                                className="grade-pill"
-                                value={course.grade}
-                                onChange={e => handleUpdate(course.id, 'grade', e.target.value)}
-                                style={{ color: getGradeColor(course.grade), fontSize: '0.9rem', padding: '0.25rem' }}
-                            >
-                                {gradeOptions.map(g => <option key={g} value={g}>{g}</option>)}
-                            </select>
-
-                            <button onClick={() => handleRemove(course.id)} style={{ background: 'transparent', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '1rem' }}>×</button>
-                        </div>
-                    ))}
-
-                    {courses.length > 0 && (
-                        <button onClick={handleAddCourse} className="btn-primary" style={{ marginTop: '1rem' }}>+ {TEXT.MESSAGES.ADD_COURSE}</button>
-                    )}
-                </div>
-                <GradingModal />
-            </main>
-
-            {/* RIGHT: IMPACT ANALYSIS */}
-            <aside className="rail">
-                <div className="spacer-rail"></div>
-                <div className="step-label">{TEXT.STEPS.THREE}</div>
-                <div className={`hud-ring ${ringPulseClass}`}>
-                    <div className={`gpa-hero ${diff < 0 ? 'trending-down' : ''}`}><AnimatedValue value={result.cgpa} /></div>
-                    <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.65rem', color: trendColor, letterSpacing: '0.2em' }}>{trendText.toUpperCase()}</div>
-                </div>
-
-                <div className='impact-meter'>
-                    <div className={`impact-arrow ${arrowType}`}>{arrowSymbol}</div>
-                    <div className='impact-value'>
-                        <span className='impact-delta' style={{ color: trendColor }}>{Math.abs(diff).toFixed(4)}</span>
-                        {hasCourses && <span className='impact-label' style={{ marginTop: '0.25rem', color: trendColor, opacity: 0.8 }}>{impactLabel}</span>}
-                        {!hasCourses && <span className='impact-label'>{TEXT.LABELS.IMPACT}</span>}
-                    </div>
-                </div>
-
-                {hasCourses && (
-                    <div style={{ marginBottom: '2rem', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', borderLeft: `2px solid ${trendColor}` }}>
-                        <div style={{ fontSize: '0.65rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{TEXT.LABELS.ANALYSIS}</div>
-                        <p style={{ margin: 0, fontSize: '0.8rem', lineHeight: '1.5', color: '#e2e8f0', marginBottom: '0.5rem' }}>
-                            {analysisIntro} <span style={{ opacity: 0.6 }}>{contextNote}</span>
-                        </p>
-                        <p style={{ margin: 0, fontSize: '0.8rem', lineHeight: '1.5', color: 'var(--accent-cyan)', fontStyle: 'italic' }}>
-                            Tip: {analysisNextStep}
-                        </p>
-                    </div>
-                )}
-
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div className="hud-stat">
-                        <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase' }}>{TEXT.LABELS.TOTAL_CREDITS}</span>
-                        <span className="stat-val" style={{ fontSize: '1rem' }}>{result.totalValidCredits}</span>
-                    </div>
-                    <div className="hud-stat">
-                        <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase' }}>{TEXT.LABELS.QUALITY_POINTS}</span>
-                        <span className="stat-val" style={{ color: 'var(--accent-cyan)', fontSize: '1rem' }}><AnimatedValue value={result.totalGradePoints} decimals={1} /></span>
-                    </div>
-                </div>
-
-                {hasCourses && (
-                    <div className="transparency-trigger" onClick={() => setShowTransparency(!showTransparency)} style={{ marginBottom: showTransparency ? '0.5rem' : '3rem' }}>
-                        <span className="transparency-text">{showTransparency ? "Hide details" : TEXT.TRANSPARENCY.TRIGGER}</span>
-                    </div>
-                )}
-
-                {showTransparency && hasCourses && (
-                    <div style={{ marginTop: '0.5rem', marginBottom: '3rem', padding: '1rem', background: 'rgba(0,0,0,0.3)', borderRadius: '12px', fontSize: '0.7rem', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <div style={{ color: 'white', fontFamily: 'var(--font-tech)', marginBottom: '0.5rem' }}>{TEXT.TRANSPARENCY.TITLE}</div>
-                        <div style={{ marginBottom: '0.5rem' }}>
-                            <div style={{ color: 'var(--accent-cyan)' }}>{TEXT.TRANSPARENCY.SECTION_BASELINE}</div>
-                            <div>{TEXT.LABELS.CURRENT_CGPA}: {baselineCGPA.toFixed(4)}</div>
-                            <div>{TEXT.TRANSPARENCY.LABEL_CREDITS}: {baselineCredits}</div>
-                            <div>→ {TEXT.TRANSPARENCY.LABEL_POINTS}: {baselinePoints.toFixed(2)}</div>
-                        </div>
-                        {scenarioCredits > 0 && (
-                            <div style={{ marginBottom: '0.5rem' }}>
-                                <div style={{ color: 'var(--accent-cyan)' }}>{TEXT.TRANSPARENCY.SECTION_SCENARIO}</div>
-                                {courses.map(c => (
-                                    <div key={c.id} style={{ paddingLeft: '0.5rem', borderLeft: '1px solid #334155' }}>
-                                        {c.code || "Course"}: {c.credits}cr × {currentPolicy?.gradingScale.find(g => g.grade === c.grade)?.point.toFixed(2)} ({c.grade})
-                                    </div>
-                                ))}
-                                <div>→ {TEXT.TRANSPARENCY.LABEL_POINTS}: {scenarioPoints.toFixed(2)}</div>
-                            </div>
-                        )}
-                        <div style={{ marginBottom: '0.5rem' }}>
-                            <div style={{ color: 'var(--accent-cyan)' }}>{TEXT.TRANSPARENCY.SECTION_AGGREGATION}</div>
-                            {baselinePoints.toFixed(2)} + {scenarioPoints.toFixed(2)} = {result.totalGradePoints.toFixed(2)} pts
-                        </div>
-                        <div style={{ borderTop: '1px dashed #334155', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
-                            <div style={{ color: 'white' }}>{TEXT.TRANSPARENCY.SECTION_RESULT}</div>
-                            {result.totalGradePoints.toFixed(2)} ÷ {result.totalValidCredits} = <span style={{ color: 'var(--accent-cyan)' }}>{result.cgpa.toFixed(4)}</span>
-                        </div>
-                        <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div style={{ color: 'white', fontFamily: 'var(--font-tech)', marginBottom: '0.5rem' }}>{TEXT.TRANSPARENCY.GRADING_SCALE_TITLE}</div>
-                            <div style={{ color: 'var(--accent-cyan)', fontSize: '0.8rem', marginBottom: '0.75rem', fontWeight: 600 }}>
-                                {currentPolicy?.name}
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.25rem' }}>
-                                {currentPolicy?.gradingScale.map(g => (
-                                    <div key={g.grade}>{g.grade} = {g.point.toFixed(4)}</div>
-                                ))}
-                            </div>
-                            <div style={{ marginTop: '0.5rem', fontStyle: 'italic', opacity: 0.6 }}>{TEXT.TRANSPARENCY.NOTE}</div>
-                        </div>
-                    </div>
-                )}
-
-                {targetSet && (
-                    <div className="impact-card">
-                        <div className="impact-card-label">
-                            <span>{TEXT.LABELS.GOAL}: {targetVal.toFixed(2)}</span>
-                            <span>{distToTarget <= 0 ? TEXT.LABELS.ACHIEVED : TEXT.LABELS.IN_PROGRESS}</span>
-                        </div>
-                        <div style={{ height: '4px', width: '100%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '0.5rem', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${Math.min(100, (result.cgpa / targetVal) * 100)}%`, background: distToTarget <= 0 ? '#22d3ee' : '#c084fc', transition: 'all 0.5s' }}></div>
-                        </div>
-                        {distToTarget > 0 && <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.5rem', textAlign: 'right' }}>-{distToTarget.toFixed(4)} to go</div>}
-                    </div>
-                )}
-
-                {/* MOBILE FOOTER (Visible only on mobile/tablet) */}
-                <div className="mobile-footer" style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--border-glass)', fontSize: '0.85rem', color: '#94a3b8', textAlign: 'center', lineHeight: '1.6', width: '100%' }}>
-                    <div style={{ marginBottom: '0.75rem' }}>
-                        <span style={{ fontWeight: 600, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em', marginRight: '0.5rem', opacity: 0.8 }}>Disclaimer:</span>
-                        {TEXT.FOOTER.DISCLAIMER}
-                    </div>
-                    <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
-                        <span className="footer-link" onClick={() => setShowAboutModal(true)}>{TEXT.FOOTER.CONTACT}</span>
-                        <span className="footer-link" onClick={() => setShowLegalModal(true)}>Legal & Privacy</span>
-                    </div>
-                </div>
-            </aside>
+            <GradingModal />
+            <FormulaModal isOpen={showFormulaModal} onClose={() => setShowFormulaModal(false)} />
         </div>
     );
 };
+
