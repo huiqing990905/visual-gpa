@@ -297,7 +297,16 @@ export default function LandingPage() {
                             </p>
                             <a
                                 href="/__sample__"
-                                className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                                style={{
+                                    fontSize: '0.9rem',
+                                    color: 'var(--accent-cyan)',
+                                    fontWeight: 600,
+                                    textDecoration: 'none',
+                                    borderBottom: '1px solid transparent',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.borderBottomColor = 'var(--accent-cyan)'}
+                                onMouseLeave={(e) => e.currentTarget.style.borderBottomColor = 'transparent'}
                             >
                                 Try with sample data →
                             </a>
