@@ -10,6 +10,7 @@ import { AnimatedValue } from '../../src/components/AnimatedValue';
 import { getNextAction } from '../../src/logic/resources';
 import { NextActions } from '../../src/components/NextActions';
 import { FormulaModal } from '../../src/components/modals/FormulaModal';
+import { GradingScaleModal } from '../../src/components/modals/GradingScaleModal';
 
 export default function Workspace() {
     // Next.js params can be array or string, so we force cast or handle it.
@@ -170,69 +171,6 @@ export default function Workspace() {
 
     /* --- COMPONENTS --- */
 
-    const GradingModal = () => {
-        if (!showGradingModal) return null;
-        return (
-            <div className="modal-overlay fade-in" onClick={() => setShowGradingModal(false)} style={{
-                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-            }}>
-                <div className="modal-content scale-up" onClick={e => e.stopPropagation()} style={{
-                    background: '#0f172a', border: '1px solid rgba(255,255,255,0.1)',
-                    padding: '2rem', borderRadius: '16px', width: '90%', maxWidth: '500px',
-                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', position: 'relative'
-                }}>
-                    <button onClick={() => setShowGradingModal(false)} style={{
-                        position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none',
-                        color: '#64748b', fontSize: '1.5rem', cursor: 'pointer'
-                    }}>×</button>
-
-                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--accent-cyan)', letterSpacing: '0.1em', textAlign: 'center' }}>GRADING SCHEME</h3>
-
-                    {/* Policy Selector (if multiple) */}
-                    {(currentUni?.policies?.length || 0) > 1 && (
-                        <select
-                            value={activePolicyId}
-                            onChange={(e) => setActivePolicyId(e.target.value)}
-                            style={{
-                                width: '100%',
-                                background: 'rgba(255,255,255,0.05)',
-                                color: 'white',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '8px',
-                                padding: '0.75rem',
-                                fontSize: '0.9rem',
-                                outline: 'none',
-                                cursor: 'pointer',
-                                marginBottom: '1.5rem'
-                            }}
-                        >
-                            {currentUni?.policies?.map(p => (
-                                <option key={p.id} value={p.id} style={{ background: '#0f172a' }}>{p.name}</option>
-                            ))}
-                        </select>
-                    )}
-
-                    {/* Grade Table */}
-                    <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', paddingBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div>Grade Letter</div>
-                            <div style={{ textAlign: 'right' }}>Point Value</div>
-                        </div>
-                        {currentPolicy?.gradingScale.map((gs, i) => (
-                            <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ color: 'white', fontWeight: 700 }}>{gs.grade}</div>
-                                <div style={{ textAlign: 'right', color: 'var(--accent-cyan)' }}>{gs.point.toFixed(2)}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <button className="btn-ghost" onClick={() => setShowGradingModal(false)} style={{ width: '100%', marginTop: '1.5rem' }}>Close</button>
-                </div>
-            </div>
-        );
-    };
 
     /* --- CALCULATIONS --- */
     const handleFloatInput = (val: string, setter: (v: string) => void) => {
@@ -393,8 +331,34 @@ export default function Workspace() {
                     <span>←</span> Home
                 </button>
 
-                <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.2rem', color: 'white', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{currentUni.name}</div>
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.2rem', color: 'white', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                            {currentUni.name}
+                        </div>
+                        {currentUni.policies[0]?.gradingScale && (
+                            <button
+                                onClick={() => setShowGradingModal(true)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '4px',
+                                    width: '20px',
+                                    height: '20px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--accent-cyan)',
+                                    fontSize: '0.7rem',
+                                    cursor: 'pointer',
+                                    fontWeight: 700
+                                }}
+                                title="View Grading Scale"
+                            >
+                                i
+                            </button>
+                        )}
+                    </div>
                     <div style={{ fontFamily: 'var(--font-tech)', fontSize: '0.75rem', color: '#cbd5e1', marginTop: '0.25rem', fontWeight: 600, letterSpacing: '0.05em' }}>VISUAL GPA PLANNER</div>
                 </div>
             </header>
@@ -671,7 +635,11 @@ export default function Workspace() {
                 </div>
             )}
 
-            <GradingModal />
+            <GradingScaleModal
+                isOpen={showGradingModal}
+                onClose={() => setShowGradingModal(false)}
+                university={currentUni as any}
+            />
             <FormulaModal isOpen={showFormulaModal} onClose={() => setShowFormulaModal(false)} />
         </div>
     );
