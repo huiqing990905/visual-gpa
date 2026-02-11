@@ -103,10 +103,11 @@ export default function LandingPage() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '1.5rem 2rem',
+                padding: '1.5rem var(--landing-h-padding, 2rem)', // Use variable
                 maxWidth: '1200px',
                 margin: '0 auto',
-                width: '100%'
+                width: '100%',
+                boxSizing: 'border-box'
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                     {/* Logo Image */}
@@ -122,23 +123,27 @@ export default function LandingPage() {
             </header>
 
             <main style={{
+                width: '100%',
                 maxWidth: '1000px',
                 margin: '0 auto',
-                padding: '3rem 1.5rem', // Reduced top padding
+                padding: '3rem var(--landing-h-padding, 1.5rem)', // Use variable
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center'
+                textAlign: 'center',
+                boxSizing: 'border-box',
+                overflowX: 'hidden' // Safety gate
             }}>
 
                 {/* 1. Primary Action Hierarchy - Compressed */}
                 <h1 style={{
-                    fontSize: '3rem', // Slightly smaller
+                    fontSize: 'var(--landing-title-size)', // Responsive font size via CSS variable
                     fontWeight: 800,
                     lineHeight: '1.1',
                     marginBottom: '1rem', // Tighter spacing
                     letterSpacing: '-0.02em',
-                    maxWidth: '800px'
+                    maxWidth: '100%', // Prevent overflow
+                    overflowWrap: 'break-word' // Handle long words
                 }}>
                     Plan your CGPA <br />
                     <span style={{ color: 'var(--accent-cyan)' }}>before next semester</span>
@@ -204,11 +209,12 @@ export default function LandingPage() {
                 {/* 3. University List - Quick Start Shortcuts */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', // Tighter density
+                    gridTemplateColumns: 'var(--landing-grid-cols)', // Responsive via CSS variable
                     gap: '0.75rem', // Tighter grid
                     width: '100%',
                     maxWidth: '800px',
-                    marginBottom: '2rem' // Reduced bottom margin to connect with custom option
+                    marginBottom: '2rem', // Reduced bottom margin to connect with custom option
+                    boxSizing: 'border-box'
                 }}>
                     {filteredUnis.map((uni) => (
                         <div
@@ -218,13 +224,15 @@ export default function LandingPage() {
                                 background: 'rgba(255,255,255,0.03)',
                                 border: '1px solid rgba(255,255,255,0.05)',
                                 borderRadius: '10px',
-                                padding: '1rem', // Reduced padding
+                                padding: '1rem',
                                 cursor: 'pointer',
                                 textAlign: 'left',
                                 transition: 'all 0.15s ease',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'space-between'
+                                justifyContent: 'space-between',
+                                width: '100%', // Fill the grid column
+                                minWidth: 0 // Allow shrinking
                             }}
                             onMouseEnter={(e) => {
                                 e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
@@ -235,8 +243,8 @@ export default function LandingPage() {
                                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
                             }}
                         >
-                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                <div style={{ fontWeight: 500, fontSize: '0.95rem', color: 'white' }}>{uni.name}</div>
+                            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <div style={{ fontWeight: 500, fontSize: '0.95rem', color: 'white', overflow: 'hidden', textOverflow: 'ellipsis' }}>{uni.name}</div>
                             </div>
                             <div style={{ color: 'var(--accent-cyan)', opacity: 0.6, fontSize: '1.2rem', marginLeft: '0.5rem' }}>›</div>
                         </div>
@@ -244,7 +252,13 @@ export default function LandingPage() {
 
                     {filteredUnis.length === 0 && (
                         <div style={{ gridColumn: '1 / -1', padding: '2rem', color: '#64748b' }}>
-                            University not found. <br /> <a href="#" style={{ color: 'var(--accent-cyan)' }}>Request it here.</a>
+                            University not found. <br />
+                            <span
+                                onClick={() => setShowContact(true)}
+                                style={{ color: 'var(--accent-cyan)', cursor: 'pointer', textDecoration: 'underline' }}
+                            >
+                                Request it here.
+                            </span>
                         </div>
                     )}
                 </div>
@@ -253,7 +267,13 @@ export default function LandingPage() {
                 <div style={{
                     marginBottom: '4rem',
                     color: '#64748b',
-                    fontSize: '0.9rem'
+                    fontSize: '0.9rem',
+                    width: '100%',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box',
+                    padding: '0 var(--landing-h-padding, 1rem)',
+                    textAlign: 'center',
+                    lineHeight: '1.5' // Better mobile wrapping
                 }}>
                     Don't see your university?{' '}
                     <span
@@ -263,7 +283,8 @@ export default function LandingPage() {
                             textDecoration: 'underline',
                             cursor: 'pointer',
                             textUnderlineOffset: '4px',
-                            transition: 'color 0.2s'
+                            transition: 'color 0.2s',
+                            display: 'inline' // Changed from inline-block to allow natural wrapping
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
                         onMouseLeave={(e) => e.currentTarget.style.color = '#94a3b8'}
@@ -280,13 +301,7 @@ export default function LandingPage() {
                     borderTop: '1px solid rgba(255,255,255,0.05)',
                     paddingTop: '3rem'
                 }}>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '3rem',
-                        alignItems: 'center',
-                        textAlign: 'left'
-                    }}>
+                    <div className="predict-future-grid">
                         <div>
                             <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', fontWeight: 600, color: 'white' }}>
                                 Predict your future
@@ -313,7 +328,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Demo Placeholder (Secondary) */}
-                        <div style={{ transform: 'scale(0.9)', transformOrigin: 'top right', opacity: 0.9 }}>
+                        <div className="demo-placeholder-wrapper">
                             <DemoPlaceholder />
                         </div>
                     </div>
