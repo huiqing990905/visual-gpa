@@ -9,6 +9,8 @@
 
 This project demonstrates a modern, component-driven approach to complex state management and responsive UI design using Next.js App Router and TypeScript.
 
+![Visual GPA Landing Page](public/landing-hero.png)
+
 ---
 
 ## 🚀 Live Demo
