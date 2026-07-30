@@ -1,55 +1,69 @@
 import type { Metadata } from 'next';
 import WorkspaceClient from './WorkspaceClient';
-import { sampleUniversities } from '../../src/data/sample';
-import { TEXT } from '../../src/text';
+import { getUniversity, listUniversities } from '../../src/data/registry';
+
+const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
 
 export async function generateMetadata({ params }: { params: Promise<{ uni: string }> }): Promise<Metadata> {
     const { uni: uniId } = await params;
-    const uni = sampleUniversities.find((u) => u.id === uniId);
-    const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
+    const uni = getUniversity(uniId);
 
-    if (!uni) {
+    if (!uni || uni.id === 'custom') {
+        const isDemo = uniId === 'demo' || uniId === '__sample__';
         return {
-            title: 'VisualGPA - Academic Intelligence',
-            description: 'The most advanced visual GPA planner for university students.',
+            title: isDemo
+                ? 'Sample CGPA workspace'
+                : uniId === 'custom'
+                    ? 'Custom grading scale CGPA planner'
+                    : 'Private CGPA Planner',
+            description: isDemo
+                ? 'Explore a private VisualGPA sample plan. Your grades stay on your device.'
+                : 'Plan courses and compare CGPA scenarios privately on your device.',
+            alternates: {
+                canonical: `${baseUrl}/${uniId === '__sample__' ? 'demo' : uniId}`,
+            },
         };
     }
 
-    const title = `${uni.name} ${uni.shortName && uni.shortName !== uni.name ? `(${uni.shortName})` : ''} CGPA Calculator`;
-    const description = `Calculate your ${uni.shortName || uni.name} CGPA instantly with VisualGPA. The most accurate, visual GPA planner for ${uni.shortName || uni.name} students in Malaysia. Track performance, plan target GPAs, and simulate scenarios.`;
+    const short = uni.shortName || uni.name;
+    const title = `${short} CGPA Calculator`;
+    const description = `Plan courses and compare CGPA scenarios with the ${uni.name} grading policy (${uni.country}). Your grades stay on your device.`;
+    const countryKeyword = uni.country === 'Singapore'
+        ? 'singapore university gpa calculator'
+        : 'malaysia university cgpa calculator';
     const imageUrl = `${baseUrl}${uni.imageUrl}`;
 
     return {
-        title: title,
-        description: description,
+        title,
+        description,
         keywords: [
-            `${uni.shortName || uni.name} cgpa calculator`,
+            `${short} cgpa calculator`,
             `${uni.name} cgpa calculator`,
-            `${uni.shortName || uni.name} gpa calculator`,
-            `calculate cgpa ${uni.shortName || uni.name}`,
-            `${uni.shortName || uni.name} grading system`,
-            `${uni.shortName || uni.name} grading scale`,
-            'malaysia university cgpa calculator',
-            'visual gpa planner'
+            `${short} gpa calculator`,
+            `calculate cgpa ${short}`,
+            `${short} grading system`,
+            `${short} grading scale`,
+            countryKeyword,
+            'visual gpa planner',
         ],
         openGraph: {
-            title: title,
-            description: description,
+            title: `${title} · VisualGPA`,
+            description,
             url: `${baseUrl}/${uniId}`,
             images: [
                 {
                     url: imageUrl,
                     width: 1200,
                     height: 630,
-                    alt: `${uni.name} Campus`,
+                    alt: `${uni.name} CGPA planner`,
                 },
             ],
             type: 'website',
         },
         twitter: {
             card: 'summary_large_image',
-            title: title,
-            description: description,
+            title: `${title} · VisualGPA`,
+            description,
             images: [imageUrl],
         },
         alternates: {
@@ -58,11 +72,11 @@ export async function generateMetadata({ params }: { params: Promise<{ uni: stri
     };
 }
 
-// Generate static params for known universities to enable static optimization
 export async function generateStaticParams() {
-    return sampleUniversities.map((uni) => ({
+    const packs = listUniversities({ includeCustom: true }).map((uni) => ({
         uni: uni.id,
     }));
+    return [...packs, { uni: 'demo' }];
 }
 
 export default function WorkspacePage() {

@@ -79,8 +79,9 @@ graph TD
 
         subgraph Core_Engine [Logic & Data Layer]
             calc_engine[Calculation Engine <br/> src/logic/calculator.ts <br/> (Pure Functions)]
-            data_store[University Data <br/> src/data/sample.ts <br/> (Static JSON)]
+            data_store[Policy Packs <br/> src/data/packs + registry <br/> (Drop-in Uni Config)]
             types[Type System <br/> src/types.ts]
+            resolve[Policy Resolve / Snapshot <br/> src/logic/policyResolve.ts]
         end
     end
 

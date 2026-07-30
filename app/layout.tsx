@@ -1,21 +1,41 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { TEXT } from '@/src/text';
+
+const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
 
 export const metadata: Metadata = {
-    title: 'VisualGPA - Academic Intelligence & CGPA Planner',
-    description: 'Calculate your projected CGPA, plan scenarios, and visualize university grading outcomes with precision.',
-    metadataBase: new URL(process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech'),
+    title: {
+        default: 'VisualGPA — Private CGPA Planner for Malaysia & Singapore',
+        template: '%s · VisualGPA',
+    },
+    description:
+        'Plan courses, compare CGPA scenarios, and reverse-solve a target grade for Malaysian and Singapore universities. Your grades stay on your device.',
+    metadataBase: new URL(baseUrl),
+    keywords: [
+        'cgpa calculator',
+        'gpa planner',
+        'malaysia university cgpa calculator',
+        'singapore university gpa calculator',
+        'TAR UMT cgpa calculator',
+        'UTAR cgpa calculator',
+        'NUS gpa calculator',
+        'NTU gpa calculator',
+        'SMU gpa calculator',
+        'UM cgpa calculator',
+        'visual gpa planner',
+    ],
     openGraph: {
-        title: 'VisualGPA - Academic Intelligence & CGPA Planner',
-        description: 'The most advanced visual GPA planner for university students. Plan scenarios and track performance.',
+        title: 'VisualGPA — Private CGPA Planner',
+        description:
+            'Plan courses and compare CGPA scenarios for Malaysia and Singapore universities. Grades stay on your device.',
         url: '/',
         siteName: 'VisualGPA',
         images: [
             {
-                url: '/utar_campus.png', // Default image
+                url: '/logo.svg',
                 width: 1200,
                 height: 630,
+                alt: 'VisualGPA private CGPA planner',
             },
         ],
         locale: 'en_US',
@@ -23,9 +43,13 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'VisualGPA - Academic Intelligence & CGPA Planner',
-        description: 'The most advanced visual GPA planner for university students. Plan scenarios and track performance.',
-        images: ['/utar_campus.png'],
+        title: 'VisualGPA — Private CGPA Planner',
+        description:
+            'Plan courses and compare CGPA scenarios for Malaysia and Singapore universities.',
+        images: ['/logo.svg'],
+    },
+    alternates: {
+        canonical: baseUrl,
     },
 };
 

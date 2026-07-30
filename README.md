@@ -42,9 +42,9 @@ This project demonstrates a modern, component-driven approach to complex state m
 The system is designed with a strict separation of concerns between **Academic Policy** and **Calculation Logic**.
 
 ### Core Components
-1.  **Data Layer (`src/data`)**: Defines static university metadata and grading policies (JSON structures).
-2.  **Logic Layer (`src/logic`)**: Contains the core `calculateCGPA` engine. This is a **pure functional pipeline** that transforms a list of courses into a rigorous academic result, ensuring 100% testability and predictability.
-3.  **UI Layer (`app/`)**: Handles presentation and user interaction. It uses a **Client-Side SPA** architecture within the Next.js App Router to manage complex local state (course lists, modals) without server round-trips.
+1.  **Data Layer (`src/data`)**: Drop-in **policy packs** under `src/data/packs/*`, aggregated by `registry.ts`. Add a university by creating one pack file and registering it — calculation engine stays untouched.
+2.  **Logic Layer (`src/logic`)**: Pure functions — CGPA engine, target reverse-solve, classification, policy version resolve/snapshot, privacy-safe share encoding, import/export. Covered by Vitest (`npm test`).
+3.  **UI Layer (`app/` + `src/components`)**: Workspace uses `useWorkspaceState` for persistence/scenarios; panels explain rules, compare plans, and share grade-free summaries via `#share=` hash.
 
 ### Directory Structure
 ```
@@ -101,6 +101,13 @@ To run this project locally:
     ```
 
 4.  Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+5.  **Run unit tests** (pure logic layer)
+    ```bash
+    npm test
+    ```
+
+To add another university without touching the calculator, see [docs/POLICY_PACKS.md](docs/POLICY_PACKS.md).
 
 ## 🔮 Future Improvements
 
