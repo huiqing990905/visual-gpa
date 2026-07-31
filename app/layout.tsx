@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
+const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqing-tech.com';
 
 export const metadata: Metadata = {
     title: {

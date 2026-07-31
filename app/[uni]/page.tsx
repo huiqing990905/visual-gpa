@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import WorkspaceClient from './WorkspaceClient';
 import { getUniversity, listUniversities } from '../../src/data/registry';
 
-const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
+const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqing-tech.com';
 
 export async function generateMetadata({ params }: { params: Promise<{ uni: string }> }): Promise<Metadata> {
     const { uni: uniId } = await params;

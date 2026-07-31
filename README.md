@@ -15,7 +15,7 @@ This project demonstrates a modern, component-driven approach to complex state m
 
 ## 🚀 Live Demo
 
-**[Deployed Application: visualgpa.hqinglab.tech](https://visualgpa.hqinglab.tech/)**
+**[Deployed Application: visualgpa.hqing-tech.com](https://visualgpa.hqing-tech.com/)**
 
 ---
 

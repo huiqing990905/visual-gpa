@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { listUniversities } from '@/src/data/registry';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqinglab.tech';
+    const baseUrl = process.env.VITE_BASE_URL || 'https://visualgpa.hqing-tech.com';
     const now = new Date();
 
     const routes: MetadataRoute.Sitemap = [
